@@ -1,47 +1,26 @@
 import java.lang.RuntimeException
 import java.util.*
+import java.time.LocalDate
 
 object Library {
-    val books: MutableSet<Book> = mutableSetOf()
-    private var rentals: MutableMap<Int,Pair<String, Date>?> = mutableMapOf() // map of (invNo,(customerOIB,rentDueDate))
-    class BookNotFoundException : RuntimeException{
-        constructor() : this("")
-        constructor(message:String):super(message)
-    }
-    class BookInStockException : RuntimeException{
-        constructor() : this("")
-        constructor(message:String):super(message)
-    }
-    init{
+    private var rentals: MutableMap<Int,Pair<String, LocalDate>> = mutableMapOf() // map of (invNo,(customerOIB,rentDueDate))
+    class BookNotFoundException(message: String) : RuntimeException(message){}
+    val books: Set<Book> = setOf(
         //for same books, but different instances (inventory numbers), we can use copy
-        books.add(Book("It","Stephen King", 1))
-        books.add(Book("Doctor Sleep","Stephen King", 7))
-        books.add(Book("A Random Book","Fran Kukec", 8))
-        books.add(Book("Harry Potter and the Deathly Hallows","J. K. Rowling", 5))
-        books.add(Book("Ready Player One","Ernest Cline", 10))
+        Book("It","Stephen King", 1),
+        Book("It","Stephen King", 2),
+        Book("It","Stephen King", 3),
+        Book("Harry Potter and the Deathly Hallows","J. K. Rowling", 5),
+        Book("Ready Player One","Ernest Cline", 10),
 
-        books.add(Book("The Great Gatsby","Francis Scott Fitzgerald", 28))
-        books.add(Book("A Game Of Thrones","George R. R. Martin", 52))
-        books.add(Book("The Last Wish","Andrzej Sapkowski", 50))
-        books.add(Book("Harry Potter and the Philosopher's stone","J. K. Rowling", 17))
-        books.add(Book("Ready Player Two","Ernest Cline", 100))
-    }
+        Book("The Great Gatsby","Francis Scott Fitzgerald", 28),
+        Book("The Great Gatsby","Francis Scott Fitzgerald", 29),
+        Book("The Last Wish","Andrzej Sapkowski", 50),
+        Book("Harry Potter and the Philosopher's stone","J. K. Rowling", 17),
+        Book("Ready Player Two","Ernest Cline", 100)
+    )
 
-    init{
-        rentals.put(1,null)
-        rentals.put(7,null)
-        rentals.put(8,null)
-        rentals.put(5,null)
-        rentals.put(10,null)
-
-        rentals.put(28,null)
-        rentals.put(52,null)
-        rentals.put(50,null)
-        rentals.put(17,null)
-        rentals.put(100,null)
-    }
-
-    private fun computeDate(duration:RentDuration):Date{
+    private fun computeDateOld(duration:RentDuration):Date{
         val cal=Calendar.getInstance()
         when(duration){
             RentDuration.TWO_WEEKS -> cal.add(Calendar.DATE, 14)
@@ -51,13 +30,19 @@ object Library {
         return cal.time
     }
 
+    //mislili ste ovako?
+    private fun computeDate(duration:RentDuration):LocalDate{
+        return when(duration){
+            RentDuration.TWO_WEEKS -> LocalDate.now().plusDays(14)
+            RentDuration.MONTH -> LocalDate.now().plusMonths(1)
+            RentDuration.TWO_MONTHS -> LocalDate.now().plusMonths(2)
+        }
+    }
+
     fun isBookAvailable(title: String, authorName: String):Boolean{
         for(book in books){
             if(book.title==title && book.authorName==authorName){
-                if(rentals[book.inventoryNo] is Pair<String,Date>) {
-                    return false
-                }
-                    return true
+                return !rentals.containsKey(book.inventoryNo)
             }
         }
         return false
@@ -66,7 +51,7 @@ object Library {
     fun rentBook(title: String, authorName: String, customerOIB: String, duration:
     RentDuration):Book?{
         for(book in books){
-            if(book.title==title && book.authorName==authorName && rentals[book.inventoryNo]==null){
+            if(book.title==title && book.authorName==authorName && !rentals.containsKey(book.inventoryNo)){
                 rentals[book.inventoryNo]=Pair(customerOIB,computeDate(duration))
                 return book
             }
@@ -75,29 +60,20 @@ object Library {
     }
 
     fun returnBook(book:Book){
-        if(!rentals.containsKey(book.inventoryNo)||!books.contains(book)) throw BookNotFoundException("Book does not exist in rental files or inventory.")
-        if(rentals.containsKey(book.inventoryNo)){
-            if(rentals[book.inventoryNo]==null) throw BookInStockException("Book was not rented in the first place.")
-        }
-        rentals.replace(book.inventoryNo,null)
+        if(rentals.remove(book.inventoryNo) == null) throw BookNotFoundException("Book does not exist in current rental files.")
     }
 
     fun isBookRented(book: Book):Boolean{
-        if(books.contains(book) && rentals.containsKey(book.inventoryNo)){
-            return rentals[book.inventoryNo] is Pair<String,Date>
-        }
-        return false
+        return rentals.containsKey(book.inventoryNo)
     }
 
     fun getRentedBooks(customerOIB: String):List<Book>{
         val bookList: MutableList<Book> = mutableListOf()
         for(book in books){
-            if(rentals.containsKey(book.inventoryNo)){
-                val rentalInfo:Pair<String, Date>? =rentals[book.inventoryNo]
-                if (rentalInfo != null) {
-                    if (rentalInfo.first == customerOIB) {
-                        bookList.add(book)
-                    }
+            val rentalInfo:Pair<String, LocalDate>? =rentals[book.inventoryNo]
+            if (rentalInfo != null) {
+                if (rentalInfo.first == customerOIB) {
+                    bookList.add(book)
                 }
             }
         }

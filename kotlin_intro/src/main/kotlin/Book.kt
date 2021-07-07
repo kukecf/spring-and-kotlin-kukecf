@@ -1,6 +1,6 @@
 data class Book(
     val title: String,
-    val authorName: String, // can be nullable (?) because it may not be known
+    val authorName: String,
     val inventoryNo: Int
 )
 
