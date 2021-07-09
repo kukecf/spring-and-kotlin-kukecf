@@ -88,7 +88,7 @@ fun returnTest() {
 }
 
 fun main() {
-    availabilityTest()
-    rentingTest()
+    //availabilityTest()
+    //rentingTest()
     returnTest()
 }

@@ -63,10 +63,10 @@ object Library {
     }
 
     fun getRentedBooks(customerOIB: String): List<BookDate> {
-        return books.map { book ->
-          BookDate(book,rentals[book.inventoryNo]?.second)
-        }.filter { bookdate ->
-            bookdate.dueDate != null && rentals[bookdate.book.inventoryNo]?.first == customerOIB
+        return books.filter { book ->
+            rentals[book.inventoryNo]?.first == customerOIB
+        }.map { book ->
+            BookDate(book, rentals[book.inventoryNo]?.second)
         }
     }
 }
