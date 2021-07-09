@@ -20,9 +20,11 @@ fun rentingTest() {
         Library.rentBook("Ready Player One", "Ernest Cline", oib1, RentDuration.MONTH)
     )
     println("Rent attempts: if successful, they are a book, if not, they are null.")
+    println("----------------------")
     for (attempt in rentAttempts) {
         println(attempt)
     }
+    println("----------------------")
     val listRented1 = Library.getRentedBooks(oib1)
     for (book in listRented1) {
         println("Osoba 1 je posudila $book.")

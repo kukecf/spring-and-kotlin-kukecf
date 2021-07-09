@@ -45,9 +45,9 @@ object Library {
         val book = books.find { book ->
             book.title == title && book.authorName == authorName && !rentals.containsKey(book.inventoryNo)
         }
-        if(book != null){
-                rentals[book.inventoryNo] = Pair(customerOIB, computeDate(duration))
-                return book
+        if (book != null) {
+            rentals[book.inventoryNo] = Pair(customerOIB, computeDate(duration))
+            return book
         }
         return null
     }
@@ -63,8 +63,8 @@ object Library {
     }
 
     fun getRentedBooks(customerOIB: String): List<Book> {
-        return books.filter{
-            book-> rentals[book.inventoryNo]?.first==customerOIB
+        return books.filter { book ->
+            rentals[book.inventoryNo]?.first == customerOIB
         }
     }
 }
