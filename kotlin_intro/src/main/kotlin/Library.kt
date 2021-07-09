@@ -1,12 +1,13 @@
 import java.lang.RuntimeException
 import java.util.*
 import java.time.LocalDate
+import java.util.stream.Collectors
 
 object Library {
-    private var rentals: MutableMap<Int, Pair<String, LocalDate>> =
-        mutableMapOf() // map of (invNo,(customerOIB,rentDueDate))
+    // map of (invNo,(customerOIB,rentDueDate))
+    private var rentals: MutableMap<Int, Pair<String, LocalDate>> = mutableMapOf()
 
-    class BookNotFoundException(message: String) : RuntimeException(message) {}
+    class BookNotFoundException(message: String) : RuntimeException(message)
 
     val books: Set<Book> = setOf(
         //for same books, but different instances (inventory numbers), we can use copy
@@ -23,17 +24,6 @@ object Library {
         Book("Ready Player Two", "Ernest Cline", 100)
     )
 
-    private fun computeDateOld(duration: RentDuration): Date {
-        val cal = Calendar.getInstance()
-        when (duration) {
-            RentDuration.TWO_WEEKS -> cal.add(Calendar.DATE, 14)
-            RentDuration.MONTH -> cal.add(Calendar.MONTH, 1)
-            RentDuration.TWO_MONTHS -> cal.add(Calendar.MONTH, 2)
-        }
-        return cal.time
-    }
-
-    //mislili ste ovako?
     private fun computeDate(duration: RentDuration): LocalDate {
         return when (duration) {
             RentDuration.TWO_WEEKS -> LocalDate.now().plusDays(14)
@@ -43,29 +33,29 @@ object Library {
     }
 
     fun isBookAvailable(title: String, authorName: String): Boolean {
-        for (book in books) {
-            if (book.title == title && book.authorName == authorName) {
-                return !rentals.containsKey(book.inventoryNo)
-            }
+        return books.any { book ->
+            book.title == title && book.authorName == authorName && !rentals.containsKey(book.inventoryNo)
         }
-        return false
     }
 
     fun rentBook(
         title: String, authorName: String, customerOIB: String, duration:
         RentDuration
     ): Book? {
-        for (book in books) {
-            if (book.title == title && book.authorName == authorName && !rentals.containsKey(book.inventoryNo)) {
+        val book = books.find { book ->
+            book.title == title && book.authorName == authorName && !rentals.containsKey(book.inventoryNo)
+        }
+        if(book != null){
                 rentals[book.inventoryNo] = Pair(customerOIB, computeDate(duration))
                 return book
-            }
         }
         return null
     }
 
     fun returnBook(book: Book) {
-        if (rentals.remove(book.inventoryNo) == null) throw BookNotFoundException("Book does not exist in current rental files.")
+        if (rentals.remove(book.inventoryNo) == null) {
+            throw BookNotFoundException("Book does not exist in current rental files.")
+        }
     }
 
     fun isBookRented(book: Book): Boolean {
@@ -73,15 +63,8 @@ object Library {
     }
 
     fun getRentedBooks(customerOIB: String): List<Book> {
-        val bookList: MutableList<Book> = mutableListOf()
-        for (book in books) {
-            val rentalInfo: Pair<String, LocalDate>? = rentals[book.inventoryNo]
-            if (rentalInfo != null) {
-                if (rentalInfo.first == customerOIB) {
-                    bookList.add(book)
-                }
-            }
+        return books.filter{
+            book-> rentals[book.inventoryNo]?.first==customerOIB
         }
-        return bookList
     }
 }
