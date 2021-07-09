@@ -3,6 +3,8 @@ import java.util.*
 import java.time.LocalDate
 import java.util.stream.Collectors
 
+data class BookDate(val book: Book, val dueDate: LocalDate?) //nedostatak mastovitosti imenovanja
+
 object Library {
     // map of (invNo,(customerOIB,rentDueDate))
     private var rentals: MutableMap<Int, Pair<String, LocalDate>> = mutableMapOf()
@@ -45,11 +47,9 @@ object Library {
         val book = books.find { book ->
             book.title == title && book.authorName == authorName && !rentals.containsKey(book.inventoryNo)
         }
-        if (book != null) {
+        return book?.also {
             rentals[book.inventoryNo] = Pair(customerOIB, computeDate(duration))
-            return book
         }
-        return null
     }
 
     fun returnBook(book: Book) {
@@ -62,9 +62,11 @@ object Library {
         return rentals.containsKey(book.inventoryNo)
     }
 
-    fun getRentedBooks(customerOIB: String): List<Book> {
-        return books.filter { book ->
-            rentals[book.inventoryNo]?.first == customerOIB
+    fun getRentedBooks(customerOIB: String): List<BookDate> {
+        return books.map { book ->
+          BookDate(book,rentals[book.inventoryNo]?.second)
+        }.filter { bookdate ->
+            bookdate.dueDate != null && rentals[bookdate.book.inventoryNo]?.first == customerOIB
         }
     }
 }
