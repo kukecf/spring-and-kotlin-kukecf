@@ -1,14 +1,13 @@
 package com.infinum.academy.hw2
 
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.core.io.Resource
 import org.springframework.stereotype.Component
 
-@Component
 @Qualifier("in-memory")
 class InMemoryCourseRepository(private val resource: DataSource) : CourseRepository {
     private val courses = mutableMapOf<Long, Course>()
-    init{
+
+    init {
         println(resource.dbName)
         println(resource.username)
         println(resource.password)
