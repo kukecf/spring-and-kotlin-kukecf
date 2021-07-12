@@ -5,11 +5,11 @@ import org.springframework.stereotype.Component
 
 @Component
 class CourseService(
-    @Qualifier("\${in-file}") private val repo:CourseRepository
+    @Qualifier("switch") private val repo: CourseRepository
 ) {
-    fun insertIntoRepo(name:String):Long = repo.insert(name)
+    fun insertIntoRepo(name: String): Long = repo.insert(name)
 
-    fun findUserById(id:Long):Course = repo.findById(id)
+    fun findCourseById(id: Long): Course = repo.findById(id)
 
-    fun deleteUserById(id: Long): Course = repo.deleteById(id)
+    fun deleteCourseById(id: Long): Course = repo.deleteById(id)
 }

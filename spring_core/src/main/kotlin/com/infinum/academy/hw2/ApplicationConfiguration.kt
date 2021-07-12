@@ -6,35 +6,27 @@ import org.springframework.context.annotation.*
 import org.springframework.core.env.Environment
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.PathResource
-
+import org.springframework.core.io.Resource
 
 @Configuration
 @ComponentScan
 @PropertySource("classpath:application.properties")
 class ApplicationConfiguration {
     @Bean
-    @Qualifier("in-memory")
-    fun inMemoryCourseRepository(src: DataSource): CourseRepository = InMemoryCourseRepository(src)
+    fun resource(src: DataSource): Resource = PathResource(src.dbName)
 
     @Bean
-    @Qualifier("in-file")
-    fun inFileCourseRepository(src: DataSource): CourseRepository {
-        val name = src.dbName
-        val resource = PathResource(name) // ili FileSystemResource? Koja je razlika u praksi?
-        return InFileCourseRepository(resource)
-    }
-
-    @Bean
-    fun switch(@Value("\${repo.switch}") crSwitch:String):Switch = Switch(crSwitch)
-
+    @Qualifier("switch")
+    fun switch(@Value("\${repo.switch}") crSwitch: String, r:Resource, d:DataSource): CourseRepository =
+        if(crSwitch=="turned-on") InMemoryCourseRepository(d) else InFileCourseRepository(r)
 }
 
 data class Switch(
-    val value:String
-    )
+    val value: String
+)
 
 fun main() {
     val appContext = AnnotationConfigApplicationContext(ApplicationConfiguration::class.java)
     val courseService = appContext.getBean(CourseService::class.java)
-    println(courseService.findUserById(courseService.insertIntoRepo("Stef")))
+    println(courseService.findCourseById(courseService.insertIntoRepo("Stef")))
 }

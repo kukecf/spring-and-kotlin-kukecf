@@ -5,6 +5,7 @@ import org.springframework.core.io.Resource
 import org.springframework.stereotype.Component
 import java.io.FileOutputStream
 
+//@Component
 @Qualifier("in-file")
 class InFileCourseRepository(
     private val coursesFileResource: Resource // will be provided through dependency injection
@@ -13,7 +14,6 @@ class InFileCourseRepository(
         if (coursesFileResource.exists().not()) {
             coursesFileResource.file.createNewFile()
         }
-        println("infile")
     }
 
     override fun insert(name: String): Long {
