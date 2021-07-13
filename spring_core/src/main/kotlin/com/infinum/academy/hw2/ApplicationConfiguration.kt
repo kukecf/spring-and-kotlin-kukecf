@@ -2,6 +2,7 @@ package com.infinum.academy.hw2
 
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.beans.factory.getBean
 import org.springframework.context.annotation.*
 import org.springframework.core.env.Environment
 import org.springframework.core.io.FileSystemResource
@@ -16,17 +17,17 @@ class ApplicationConfiguration {
     fun resource(src: DataSource): Resource = PathResource(src.dbName)
 
     @Bean
-    @Qualifier("switch")
-    fun switch(@Value("\${repo.switch}") crSwitch: String, r:Resource, d:DataSource): CourseRepository =
-        if(crSwitch=="turned-on") InMemoryCourseRepository(d) else InFileCourseRepository(r)
+    fun switch(
+        @Value("\${repo.switch}") isMemory: Boolean,
+        resource: Resource,
+        dataSource: DataSource
+    ): CourseRepository =
+        if (isMemory) InMemoryCourseRepository(dataSource) else InFileCourseRepository(resource)
 }
 
-data class Switch(
-    val value: String
-)
-
+//ovo je rucni test
 fun main() {
     val appContext = AnnotationConfigApplicationContext(ApplicationConfiguration::class.java)
-    val courseService = appContext.getBean(CourseService::class.java)
+    val courseService = appContext.getBean<CourseService>()
     println(courseService.findCourseById(courseService.insertIntoRepo("Stef")))
 }

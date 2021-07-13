@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class CourseService(
-    @Qualifier("switch") private val repo: CourseRepository
+    private val repo: CourseRepository
 ) {
     fun insertIntoRepo(name: String): Long = repo.insert(name)
 

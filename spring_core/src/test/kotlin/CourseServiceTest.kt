@@ -5,7 +5,10 @@ import com.infinum.academy.hw2.CourseService
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import io.mockk.verifyOrder
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,7 +28,7 @@ class CourseRepoTest {
             courseRepository.insert("Algorithms")
         } returns 1
         val act = courseService.insertIntoRepo("Algorithms")
-        Assertions.assertThat(act).isEqualTo(1)
+        assertThat(act).isEqualTo(1)
         verify(exactly = 1) {
             courseRepository.insert(any())
         }
@@ -41,13 +44,18 @@ class CourseRepoTest {
         } throws CourseNotFoundException(2)
 
         val first = courseService.findCourseById(1)
-        Assertions.assertThat(first).isEqualTo(Course(1, "French"))
-        verify(exactly = 1) {
-            courseRepository.findById(1)
-        }
-        Assertions.assertThatThrownBy {
+        assertThat(first).isEqualTo(Course(1, "French"))
+        assertThatThrownBy {
             courseService.findCourseById(2)
         }.isInstanceOf(CourseNotFoundException::class.java)
+        verify(exactly=1){
+            courseRepository.findById(1)
+            courseRepository.findById(2)
+        }
+        verifyOrder{
+            courseRepository.findById(1)
+            courseRepository.findById(2)
+        }
     }
 
     @Test
@@ -60,15 +68,20 @@ class CourseRepoTest {
         } throws CourseNotFoundException(2)
 
         val first = courseService.deleteCourseById(1)
-        Assertions.assertThat(first).isEqualTo(Course(1, "Sociology"))
-        verify(exactly = 1) {
-            courseRepository.deleteById(1)
-        }
+        assertThat(first).isEqualTo(Course(1, "Sociology"))
+        assertThatThrownBy {
+            courseService.deleteCourseById(2)
+        }.isInstanceOf(CourseNotFoundException::class.java).hasMessage("com.infinum.academy.hw2.Course with and ID 2 not found")
         verify(exactly=0){
             courseRepository.insert(any())
         }
-        Assertions.assertThatThrownBy {
-            courseService.deleteCourseById(2)
-        }.isInstanceOf(CourseNotFoundException::class.java).hasMessage("com.infinum.academy.hw2.Course with and ID 2 not found")
+        verify(exactly = 1) {
+            courseRepository.deleteById(1)
+            courseRepository.deleteById(2)
+        }
+        verifyOrder{
+            courseRepository.deleteById(1)
+            courseRepository.deleteById(2)
+        }
     }
 }
