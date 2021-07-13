@@ -48,11 +48,11 @@ class CourseRepoTest {
         assertThatThrownBy {
             courseService.findCourseById(2)
         }.isInstanceOf(CourseNotFoundException::class.java)
-        verify(exactly=1){
+        verify(exactly = 1) {
             courseRepository.findById(1)
             courseRepository.findById(2)
         }
-        verifyOrder{
+        verifyOrder {
             courseRepository.findById(1)
             courseRepository.findById(2)
         }
@@ -71,15 +71,16 @@ class CourseRepoTest {
         assertThat(first).isEqualTo(Course(1, "Sociology"))
         assertThatThrownBy {
             courseService.deleteCourseById(2)
-        }.isInstanceOf(CourseNotFoundException::class.java).hasMessage("com.infinum.academy.hw2.Course with and ID 2 not found")
-        verify(exactly=0){
+        }.isInstanceOf(CourseNotFoundException::class.java)
+            .hasMessage("com.infinum.academy.hw2.Course with and ID 2 not found")
+        verify(exactly = 0) {
             courseRepository.insert(any())
         }
         verify(exactly = 1) {
             courseRepository.deleteById(1)
             courseRepository.deleteById(2)
         }
-        verifyOrder{
+        verifyOrder {
             courseRepository.deleteById(1)
             courseRepository.deleteById(2)
         }

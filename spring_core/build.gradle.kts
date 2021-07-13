@@ -4,7 +4,6 @@ plugins {
     kotlin("jvm") version "1.5.10"
     id("org.jetbrains.kotlin.plugin.spring") version "1.5.20"
     jacoco
-    application
 }
 
 group = "com.infinum.academy"
@@ -38,7 +37,7 @@ tasks.withType<Test> {
 tasks.jacocoTestReport {
     reports {
         xml.required.set(false)
-        csv.required.set(true)
+        csv.required.set(false)
         html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
     }
 }
@@ -55,25 +54,4 @@ tasks.jacocoTestReport {
     dependsOn(tasks.test) // tests are required to run before generating the report
 }
 
-tasks.jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            limit {
-                minimum = "0.5".toBigDecimal()
-            }
-        }
-
-        rule {
-            enabled = false
-            element = "CLASS"
-            includes = listOf("org.gradle.*")
-
-            limit {
-                counter = "LINE"
-                value = "TOTALCOUNT"
-                maximum = "0.3".toBigDecimal()
-            }
-        }
-    }
-}
 

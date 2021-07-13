@@ -9,29 +9,31 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
+import org.springframework.core.io.Resource
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
 
 @SpringJUnitConfig(ApplicationConfiguration::class)
-@TestPropertySource("classpath:application.properties")
-class IntegrationTest @Autowired constructor() {
+@TestPropertySource(properties=[
+    "data.database-name=VelkaBP.txt",
+    "data.username=kukecf",
+    "data.password=frank",
+    "repo.switch=false"
+])
+class IntegrationTestInFile @Autowired constructor() {
     private val ctx: ApplicationContext = AnnotationConfigApplicationContext(ApplicationConfiguration::class.java)
 
     @Test
     @DisplayName("checking if required beans are present")
-    fun checkAllBeans(@Value("\${repo.switch}") isMemory: Boolean) {
-        val possibleBeans = mutableListOf(
+    fun checkAllBeans() {
+        val possibleBeans = listOf(
             CourseService::class.java,
             DataSource::class.java,
             CourseRepository::class.java,
-            ApplicationConfiguration::class.java
+            ApplicationConfiguration::class.java,
+            Resource::class.java
         )
-        if (isMemory) {
-            possibleBeans.add(InMemoryCourseRepository::class.java)
-        } else{
-            possibleBeans.add(InFileCourseRepository::class.java)
-        }
 
         for (bean in possibleBeans) {
             assertThat(ctx.getBean(bean)).isNotNull
