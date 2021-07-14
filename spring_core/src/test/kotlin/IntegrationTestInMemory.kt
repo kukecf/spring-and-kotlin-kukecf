@@ -15,15 +15,17 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
 import org.springframework.core.io.Resource
 
 @SpringJUnitConfig(ApplicationConfiguration::class)
-@TestPropertySource(properties=[
-    "data.database-name=BigDataBase",
-    "data.username=joza",
-    "data.password=joza123",
-    "repo.switch=true"
-])
-class IntegrationTestInMemory @Autowired constructor() {
-    private val ctx: ApplicationContext = AnnotationConfigApplicationContext(ApplicationConfiguration::class.java)
-
+@TestPropertySource(
+    properties = [
+        "data.database-name=BigDataBase",
+        "data.username=joza",
+        "data.password=joza123",
+        "repo.switch=true"
+    ]
+)
+class IntegrationTestInMemory @Autowired constructor(
+    private val ctx: ApplicationContext
+) {
     @Test
     @DisplayName("checking if required beans are present")
     fun checkAllBeans() {

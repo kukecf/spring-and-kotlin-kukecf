@@ -21,8 +21,9 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
     "data.password=frank",
     "repo.switch=false"
 ])
-class IntegrationTestInFile @Autowired constructor() {
-    private val ctx: ApplicationContext = AnnotationConfigApplicationContext(ApplicationConfiguration::class.java)
+class IntegrationTestInFile @Autowired constructor(
+    private val ctx: ApplicationContext
+) {
 
     @Test
     @DisplayName("checking if required beans are present")
