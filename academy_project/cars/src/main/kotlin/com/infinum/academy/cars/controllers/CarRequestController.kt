@@ -3,6 +3,7 @@ package com.infinum.academy.cars.controllers
 import com.infinum.academy.cars.repository.*
 import com.infinum.academy.cars.services.CarService
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.PostMapping
@@ -14,7 +15,7 @@ import java.time.LocalDateTime
 class CarRequestController(
     private val service: CarService
 ) {
-    @PostMapping("/addCar")
+    @PostMapping("/addCar",consumes=[MediaType.APPLICATION_JSON_VALUE])
     fun addNewCar(@RequestBody carDto: CarDto): ResponseEntity<String> {
         if (service.hasCarWithSerialNumber(carDto.serialNumber)) {
             val failMessage = "There already exists a car with serial number ${carDto.serialNumber} in the repo!"
@@ -35,7 +36,7 @@ class CarRequestController(
         return ResponseEntity.ok(message)
     }
 
-    @PostMapping("/addCarCheckUp")
+    @PostMapping("/addCarCheckUp",consumes=[MediaType.APPLICATION_JSON_VALUE])
     fun addNewCarCheckUp(@RequestBody checkUpDto: CarCheckUpDto): ResponseEntity<String> {
         if (!service.hasCarWithId(checkUpDto.carId)) {
             val failMessage = "No car with ID ${checkUpDto.carId} exists in the repo!"
