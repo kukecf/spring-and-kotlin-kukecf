@@ -1,41 +1,36 @@
 package com.infinum.academy.cars
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.google.gson.Gson
-import com.infinum.academy.cars.repository.CarCheckUpDto
-import com.infinum.academy.cars.repository.CarDto
+import com.infinum.academy.cars.resource.CarCheckUpDto
+import com.infinum.academy.cars.resource.CarDto
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.shadow.com.univocity.parsers.conversions.Conversions.string
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.http.RequestEntity.post
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
-import org.springframework.web.servlet.function.RequestPredicates.contentType
 
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class CarsApplicationTests() {
+class CarsApplicationTests(
+    @Autowired private val mapper: ObjectMapper
+) {
 
     @Autowired
     private lateinit var mvc: MockMvc
-    private val mapper: ObjectMapper = ObjectMapper()
+    //private val mapper: ObjectMapper = ObjectMapper()
 
-    @Test
-    @DisplayName("should generate basic homepage")
-    fun test1() {
-        mvc.get("/").andExpect {
-            content { equals("Welcome to my autobody shop! :)") }
-            status { is2xxSuccessful() }
-        }
+    @BeforeEach
+    fun setUp() {
+
     }
 
     @Test
@@ -43,13 +38,13 @@ class CarsApplicationTests() {
     @DirtiesContext
     fun test2() {
         val car = CarDto(1, "Peugeot", "305", 2004, "2")
-        mvc.post("/addCar") {
+
+        mvc.post("/cars/add") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car)
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            content { contentType(MediaType.APPLICATION_JSON) }.toString().contains("added this car")
         }
     }
 
@@ -58,17 +53,26 @@ class CarsApplicationTests() {
     @DirtiesContext
     fun test3() {
         val car = CarDto(1, "Peugeot", "305", 2004, "2")
-        mvc.post("/addCar") {
+
+        mvc.post("/cars/add") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car)
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            content { contentType(MediaType.APPLICATION_JSON) }.toString().contains("added this car")
+            header{exists("Location")}
         }
 
-        mvc.get("/details/{id}", 1).andExpect {
-            content { contentType(MediaType.APPLICATION_JSON) }.toString().contains(mapper.writeValueAsString(car))
+        mvc.get("/cars/{id}", 1).andExpect {
+            jsonPath("$.carId") { value("1") }
+            jsonPath("$.ownerId") { value("1") }
+            jsonPath("$.dateAdded")
+            jsonPath("$.manufacturerName") { value("Peugeot") }
+            jsonPath("$.modelName") { value("305") }
+            jsonPath("$.productionYear") { value("2004") }
+            jsonPath("$.serialNumber") { value("2") }
+            jsonPath("$.checkUps")
+            content { contentType(MediaType.APPLICATION_JSON) }
             status { is2xxSuccessful() }
         }
     }
@@ -79,21 +83,22 @@ class CarsApplicationTests() {
     fun test4() {
         val car1 = CarDto(1, "Peugeot", "305", 2004, "2")
         val car2 = CarDto(2, "Fiat", "Punto", 2007, "2")
-        mvc.post("/addCar") {
+
+        mvc.post("/cars/add") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car1)
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            content { contentType(MediaType.APPLICATION_JSON) }
+            header{exists("Location")}
         }
-        mvc.post("/addCar") {
+
+        mvc.post("/cars/add") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car2)
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
-            status { isBadRequest() }
-            content { contentType(MediaType.APPLICATION_JSON) }
+            status { isConflict() }
         }
     }
 
@@ -103,32 +108,48 @@ class CarsApplicationTests() {
     fun test5() {
         val car1 = CarDto(1, "Peugeot", "305", 2004, "2")
         val car2 = CarDto(2, "Fiat", "Punto", 2007, "4")
-        mvc.post("/addCar") {
+
+        mvc.post("/cars/add") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car1)
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            content { contentType(MediaType.APPLICATION_JSON) }
+            header{exists("Location")}
         }
-        mvc.post("/addCar") {
+
+        mvc.post("/cars/add") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car2)
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            content { contentType(MediaType.APPLICATION_JSON) }
+            header{exists("Location")}
         }
 
-        mvc.get("/details/{id}", 1).andExpect {
-            content { contentType(MediaType.APPLICATION_JSON) }.toString().contains(mapper.writeValueAsString(car1)) &&
-                    content().toString().contains(mapper.writeValueAsString(car2)).not()
+        mvc.get("/cars/{id}", 1).andExpect {
+            jsonPath("$.carId") { value("1") }
+            jsonPath("$.ownerId") { value("1") }
+            jsonPath("$.dateAdded")
+            jsonPath("$.manufacturerName") { value("Peugeot") }
+            jsonPath("$.modelName") { value("305") }
+            jsonPath("$.productionYear") { value("2004") }
+            jsonPath("$.serialNumber") { value("2") }
+            jsonPath("$.checkUps")
+            content { contentType(MediaType.APPLICATION_JSON) }
             status { is2xxSuccessful() }
         }
 
-        mvc.get("/details/{id}", 2).andExpect {
-            content { contentType(MediaType.APPLICATION_JSON) }.toString().contains(mapper.writeValueAsString(car2)) &&
-                    content().toString().contains(mapper.writeValueAsString(car1)).not()
+        mvc.get("/cars/{id}", 2).andExpect {
+            jsonPath("$.carId") { value("2") }
+            jsonPath("$.ownerId") { value("2") }
+            jsonPath("$.dateAdded")
+            jsonPath("$.manufacturerName") { value("Fiat") }
+            jsonPath("$.modelName") { value("Punto") }
+            jsonPath("$.productionYear") { value("2007") }
+            jsonPath("$.serialNumber") { value("4") }
+            jsonPath("$.checkUps")
+            content { contentType(MediaType.APPLICATION_JSON) }.toString()
             status { is2xxSuccessful() }
         }
     }
@@ -139,21 +160,23 @@ class CarsApplicationTests() {
     fun test6() {
         val car = CarDto(3, "Peugeot", "305", 2004, "2")
         val checkup = CarCheckUpDto("Josip", 2f, 1)
-        mvc.post("/addCar") {
+
+        mvc.post("/cars/add") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car)
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            content { contentType(MediaType.APPLICATION_JSON) }
+            header{exists("Location")}
         }
-        mvc.post("/addCarCheckUp") {
+
+        mvc.post("/checkups/add") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(checkup)
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            content { contentType(MediaType.APPLICATION_JSON) }
+            header{exists("Location")}
         }
     }
 
@@ -161,50 +184,63 @@ class CarsApplicationTests() {
     @DisplayName("should fail in adding checkup for nonexisting car")
     fun test7() {
         val checkup = CarCheckUpDto("Josip", 2f, 4)
-        mvc.post("/addCarCheckUp") {
+
+        mvc.post("/checkups/add") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(checkup)
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
-            status { isBadRequest() }
-            content { contentType(MediaType.APPLICATION_JSON) }
+            status { is4xxClientError() }
         }
     }
 
     @Test
     @DisplayName("should generate list of checkups for the same car")
+    @DirtiesContext
     fun test8() {
         val car = CarDto(3, "Peugeot", "305", 2004, "2")
         val checkup1 = CarCheckUpDto("Josip", 2f, 1)
         val checkup2 = CarCheckUpDto("Stef", 2f, 1)
         val regex = """\"checkups\": [(^{)+{(^})+},(^{)+{(^})+}]""".toRegex()
-        mvc.post("/addCar") {
+
+        mvc.post("/cars/add") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car)
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            content { contentType(MediaType.APPLICATION_JSON) }
+            header{exists("Location")}
         }
-        mvc.post("/addCarCheckUp") {
+
+        mvc.post("/checkups/add") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(checkup1)
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            content { contentType(MediaType.APPLICATION_JSON) }
+            header{exists("Location")}
         }
-        mvc.post("/addCarCheckUp") {
+
+        mvc.post("/checkups/add") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(checkup2)
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            content { contentType(MediaType.APPLICATION_JSON) }
+            header{exists("Location")}
         }
-        mvc.get("/details/{id}",1).andExpect {
+
+        mvc.get("/cars/{id}", 1).andExpect {
             status { is2xxSuccessful() }
-            content { contentType(MediaType.APPLICATION_JSON) }.toString().contains(regex)
+            content { contentType(MediaType.APPLICATION_JSON) }
+            jsonPath("$.carId") { value("1") }
+            jsonPath("$.ownerId") { value("3") }
+            jsonPath("$.dateAdded")
+            jsonPath("$.manufacturerName") { value("Peugeot") }
+            jsonPath("$.modelName") { value("305") }
+            jsonPath("$.productionYear") { value("2004") }
+            jsonPath("$.serialNumber") { value("2") }
+            jsonPath("$.checkUps")
         }
     }
 }
