@@ -26,7 +26,6 @@ class CarsApplicationTests(
 
     @Autowired
     private lateinit var mvc: MockMvc
-    //private val mapper: ObjectMapper = ObjectMapper()
 
     @BeforeEach
     fun setUp() {
@@ -39,7 +38,7 @@ class CarsApplicationTests(
     fun test2() {
         val car = CarDto(1, "Peugeot", "305", 2004, "2")
 
-        mvc.post("/cars/add") {
+        mvc.post("/cars/") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car)
             accept = MediaType.APPLICATION_JSON
@@ -54,7 +53,7 @@ class CarsApplicationTests(
     fun test3() {
         val car = CarDto(1, "Peugeot", "305", 2004, "2")
 
-        mvc.post("/cars/add") {
+        mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car)
             accept = MediaType.APPLICATION_JSON
@@ -64,13 +63,13 @@ class CarsApplicationTests(
         }
 
         mvc.get("/cars/{id}", 1).andExpect {
-            jsonPath("$.carId") { value("1") }
-            jsonPath("$.ownerId") { value("1") }
-            jsonPath("$.dateAdded")
-            jsonPath("$.manufacturerName") { value("Peugeot") }
-            jsonPath("$.modelName") { value("305") }
-            jsonPath("$.productionYear") { value("2004") }
-            jsonPath("$.serialNumber") { value("2") }
+            jsonPath("$.car.carId") { value("1") }
+            jsonPath("$.car.ownerId") { value("1") }
+            jsonPath("$.car.dateAdded")
+            jsonPath("$.car.manufacturerName") { value("Peugeot") }
+            jsonPath("$.car.modelName") { value("305") }
+            jsonPath("$.car.productionYear") { value("2004") }
+            jsonPath("$.car.serialNumber") { value("2") }
             jsonPath("$.checkUps")
             content { contentType(MediaType.APPLICATION_JSON) }
             status { is2xxSuccessful() }
@@ -84,7 +83,7 @@ class CarsApplicationTests(
         val car1 = CarDto(1, "Peugeot", "305", 2004, "2")
         val car2 = CarDto(2, "Fiat", "Punto", 2007, "2")
 
-        mvc.post("/cars/add") {
+        mvc.post("/cars/") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car1)
             accept = MediaType.APPLICATION_JSON
@@ -93,7 +92,7 @@ class CarsApplicationTests(
             header{exists("Location")}
         }
 
-        mvc.post("/cars/add") {
+        mvc.post("/cars/") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car2)
             accept = MediaType.APPLICATION_JSON
@@ -109,7 +108,7 @@ class CarsApplicationTests(
         val car1 = CarDto(1, "Peugeot", "305", 2004, "2")
         val car2 = CarDto(2, "Fiat", "Punto", 2007, "4")
 
-        mvc.post("/cars/add") {
+        mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car1)
             accept = MediaType.APPLICATION_JSON
@@ -118,7 +117,7 @@ class CarsApplicationTests(
             header{exists("Location")}
         }
 
-        mvc.post("/cars/add") {
+        mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car2)
             accept = MediaType.APPLICATION_JSON
@@ -128,28 +127,28 @@ class CarsApplicationTests(
         }
 
         mvc.get("/cars/{id}", 1).andExpect {
-            jsonPath("$.carId") { value("1") }
-            jsonPath("$.ownerId") { value("1") }
-            jsonPath("$.dateAdded")
-            jsonPath("$.manufacturerName") { value("Peugeot") }
-            jsonPath("$.modelName") { value("305") }
-            jsonPath("$.productionYear") { value("2004") }
-            jsonPath("$.serialNumber") { value("2") }
+            jsonPath("$.car.carId") { value("1") }
+            jsonPath("$.car.ownerId") { value("1") }
+            jsonPath("$.car.dateAdded")
+            jsonPath("$.car.manufacturerName") { value("Peugeot") }
+            jsonPath("$.car.modelName") { value("305") }
+            jsonPath("$.car.productionYear") { value("2004") }
+            jsonPath("$.car.serialNumber") { value("2") }
             jsonPath("$.checkUps")
             content { contentType(MediaType.APPLICATION_JSON) }
             status { is2xxSuccessful() }
         }
 
         mvc.get("/cars/{id}", 2).andExpect {
-            jsonPath("$.carId") { value("2") }
-            jsonPath("$.ownerId") { value("2") }
-            jsonPath("$.dateAdded")
-            jsonPath("$.manufacturerName") { value("Fiat") }
-            jsonPath("$.modelName") { value("Punto") }
-            jsonPath("$.productionYear") { value("2007") }
-            jsonPath("$.serialNumber") { value("4") }
-            jsonPath("$.checkUps")
-            content { contentType(MediaType.APPLICATION_JSON) }.toString()
+            jsonPath("$.car.carId") { value("2") }
+            jsonPath("$.car.ownerId") { value("2") }
+            jsonPath("$.car.dateAdded")
+            jsonPath("$.car.manufacturerName") { value("Fiat") }
+            jsonPath("$.car.modelName") { value("Punto") }
+            jsonPath("$.car.productionYear") { value("2007") }
+            jsonPath("$.car.serialNumber") { value("4") }
+            jsonPath("$.car.checkUps")
+            content { contentType(MediaType.APPLICATION_JSON) }
             status { is2xxSuccessful() }
         }
     }
@@ -161,7 +160,7 @@ class CarsApplicationTests(
         val car = CarDto(3, "Peugeot", "305", 2004, "2")
         val checkup = CarCheckUpDto("Josip", 2f, 1)
 
-        mvc.post("/cars/add") {
+        mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car)
             accept = MediaType.APPLICATION_JSON
@@ -170,7 +169,7 @@ class CarsApplicationTests(
             header{exists("Location")}
         }
 
-        mvc.post("/checkups/add") {
+        mvc.post("/checkups") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(checkup)
             accept = MediaType.APPLICATION_JSON
@@ -185,7 +184,7 @@ class CarsApplicationTests(
     fun test7() {
         val checkup = CarCheckUpDto("Josip", 2f, 4)
 
-        mvc.post("/checkups/add") {
+        mvc.post("/checkups") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(checkup)
             accept = MediaType.APPLICATION_JSON
@@ -203,7 +202,7 @@ class CarsApplicationTests(
         val checkup2 = CarCheckUpDto("Stef", 2f, 1)
         val regex = """\"checkups\": [(^{)+{(^})+},(^{)+{(^})+}]""".toRegex()
 
-        mvc.post("/cars/add") {
+        mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car)
             accept = MediaType.APPLICATION_JSON
@@ -212,7 +211,7 @@ class CarsApplicationTests(
             header{exists("Location")}
         }
 
-        mvc.post("/checkups/add") {
+        mvc.post("/checkups") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(checkup1)
             accept = MediaType.APPLICATION_JSON
@@ -221,7 +220,7 @@ class CarsApplicationTests(
             header{exists("Location")}
         }
 
-        mvc.post("/checkups/add") {
+        mvc.post("/checkups") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(checkup2)
             accept = MediaType.APPLICATION_JSON
@@ -233,14 +232,14 @@ class CarsApplicationTests(
         mvc.get("/cars/{id}", 1).andExpect {
             status { is2xxSuccessful() }
             content { contentType(MediaType.APPLICATION_JSON) }
-            jsonPath("$.carId") { value("1") }
-            jsonPath("$.ownerId") { value("3") }
-            jsonPath("$.dateAdded")
-            jsonPath("$.manufacturerName") { value("Peugeot") }
-            jsonPath("$.modelName") { value("305") }
-            jsonPath("$.productionYear") { value("2004") }
-            jsonPath("$.serialNumber") { value("2") }
-            jsonPath("$.checkUps")
+            jsonPath("$.car.carId") { value("1") }
+            jsonPath("$.car.ownerId") { value("3") }
+            jsonPath("$.car.dateAdded")
+            jsonPath("$.car.manufacturerName") { value("Peugeot") }
+            jsonPath("$.car.modelName") { value("305") }
+            jsonPath("$.car.productionYear") { value("2004") }
+            jsonPath("$.car.serialNumber") { value("2") }
+            jsonPath("$.car.checkUps")
         }
     }
 }

@@ -8,15 +8,14 @@ data class CarDto(
     val modelName: String,
     val productionYear: Int,
     val serialNumber: String
-) {
-    fun toDomainModel(id: Long) = Car(
-        carId = id,
-        ownerId = ownerId,
-        dateAdded = LocalDate.now(),
-        manufacturerName = manufacturerName,
-        modelName = modelName,
-        productionYear = productionYear,
-        serialNumber = serialNumber,
-        checkUps = mutableListOf()
-    )
-}
+)
+
+fun CarDto.toDomainModel(id: Long) = Car(
+    carId = id,
+    ownerId = ownerId,
+    dateAdded = LocalDate.now(),
+    manufacturerName = manufacturerName,
+    modelName = modelName,
+    productionYear = productionYear,
+    serialNumber = serialNumber
+)

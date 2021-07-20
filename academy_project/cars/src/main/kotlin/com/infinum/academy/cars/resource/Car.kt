@@ -9,6 +9,5 @@ data class Car(
     val manufacturerName: String,
     val modelName: String,
     val productionYear: Int,
-    val serialNumber: String,
-    val checkUps: MutableList<CarCheckUp>
+    val serialNumber: String
 )

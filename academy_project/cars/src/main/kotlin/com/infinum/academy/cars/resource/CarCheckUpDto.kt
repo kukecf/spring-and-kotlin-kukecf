@@ -6,12 +6,13 @@ data class CarCheckUpDto(
     val workerName: String,
     val price: Float,
     val carId: Long
-) {
-    fun toDomainModel(id: Long) = CarCheckUp(
-        checkUpId = id,
-        datePerformed = LocalDateTime.now(),
-        workerName = workerName,
-        price = price,
-        carId = carId
-    )
-}
+)
+
+fun CarCheckUpDto.toDomainModel(id: Long) = CarCheckUp(
+    checkUpId = id,
+    datePerformed = LocalDateTime.now(),
+    workerName = workerName,
+    price = price,
+    carId = carId
+)
+

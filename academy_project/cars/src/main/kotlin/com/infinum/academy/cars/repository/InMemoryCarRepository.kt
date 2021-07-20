@@ -16,8 +16,7 @@ class InMemoryCarRepository : CarRepository {
         return carId
     }
 
-    override fun findById(id: Long): Car =
-        cars[id] ?: throw CarNotFoundException("No car with ID $id exists.")
+    override fun findById(id: Long): Car? = cars[id]
 
     override fun findBySerialNumber(serialNo: String): Car? {
         return cars.values.find{
