@@ -18,7 +18,7 @@ class InMemoryCarRepository : CarRepository {
 
     override fun findById(id: Long): Car? = cars[id]
 
-    override fun findBySerialNumber(serialNo: String): Car? {
+    fun findBySerialNumber(serialNo: String): Car? {
         return cars.values.find{
             serialNo == it.serialNumber
         }

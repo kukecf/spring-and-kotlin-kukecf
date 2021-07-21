@@ -18,11 +18,10 @@ import java.net.URI
 class CarCheckUpController(
     private val service: CarService
 ) {
-    @GetMapping("/", consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @GetMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun getAllCarCheckUps(): ResponseEntity<List<CarCheckUp>> =
         ResponseEntity.ok(service.getAllCheckUps())
 
-    //@PostMapping("/add", consumes = [MediaType.APPLICATION_JSON_VALUE])
     @PostMapping
     fun addNewCarCheckUp(@RequestBody checkUpDto: CarCheckUpDto): ResponseEntity<String> {
         val id = service.addCarCheckUp(checkUpDto)

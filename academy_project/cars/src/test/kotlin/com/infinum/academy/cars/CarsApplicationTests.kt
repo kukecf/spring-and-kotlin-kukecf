@@ -20,17 +20,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class CarsApplicationTests(
-    @Autowired private val mapper: ObjectMapper
+class CarsApplicationTests @Autowired constructor(
+    private val mvc: MockMvc,
+    private val mapper: ObjectMapper
 ) {
-
-    @Autowired
-    private lateinit var mvc: MockMvc
-
-    @BeforeEach
-    fun setUp() {
-
-    }
 
     @Test
     @DisplayName("should add car and check its addition")
@@ -59,7 +52,7 @@ class CarsApplicationTests(
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            header{exists("Location")}
+            header { exists("Location") }
         }
 
         mvc.get("/cars/{id}", 1).andExpect {
@@ -77,34 +70,9 @@ class CarsApplicationTests(
     }
 
     @Test
-    @DisplayName("should try adding two cars with same serial number and fail")
-    @DirtiesContext
-    fun test4() {
-        val car1 = CarDto(1, "Peugeot", "305", 2004, "2")
-        val car2 = CarDto(2, "Fiat", "Punto", 2007, "2")
-
-        mvc.post("/cars/") {
-            contentType = MediaType.APPLICATION_JSON
-            content = mapper.writeValueAsString(car1)
-            accept = MediaType.APPLICATION_JSON
-        }.andExpect {
-            status { is2xxSuccessful() }
-            header{exists("Location")}
-        }
-
-        mvc.post("/cars/") {
-            contentType = MediaType.APPLICATION_JSON
-            content = mapper.writeValueAsString(car2)
-            accept = MediaType.APPLICATION_JSON
-        }.andExpect {
-            status { isConflict() }
-        }
-    }
-
-    @Test
     @DisplayName("should add second car and not alter details of first")
     @DirtiesContext
-    fun test5() {
+    fun test4() {
         val car1 = CarDto(1, "Peugeot", "305", 2004, "2")
         val car2 = CarDto(2, "Fiat", "Punto", 2007, "4")
 
@@ -114,7 +82,7 @@ class CarsApplicationTests(
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            header{exists("Location")}
+            header { exists("Location") }
         }
 
         mvc.post("/cars") {
@@ -123,7 +91,7 @@ class CarsApplicationTests(
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            header{exists("Location")}
+            header { exists("Location") }
         }
 
         mvc.get("/cars/{id}", 1).andExpect {
@@ -156,7 +124,7 @@ class CarsApplicationTests(
     @Test
     @DisplayName("should add car and checkup for it")
     @DirtiesContext
-    fun test6() {
+    fun test5() {
         val car = CarDto(3, "Peugeot", "305", 2004, "2")
         val checkup = CarCheckUpDto("Josip", 2f, 1)
 
@@ -166,7 +134,7 @@ class CarsApplicationTests(
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            header{exists("Location")}
+            header { exists("Location") }
         }
 
         mvc.post("/checkups") {
@@ -175,13 +143,13 @@ class CarsApplicationTests(
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            header{exists("Location")}
+            header { exists("Location") }
         }
     }
 
     @Test
     @DisplayName("should fail in adding checkup for nonexisting car")
-    fun test7() {
+    fun test6() {
         val checkup = CarCheckUpDto("Josip", 2f, 4)
 
         mvc.post("/checkups") {
@@ -196,11 +164,10 @@ class CarsApplicationTests(
     @Test
     @DisplayName("should generate list of checkups for the same car")
     @DirtiesContext
-    fun test8() {
+    fun test7() {
         val car = CarDto(3, "Peugeot", "305", 2004, "2")
         val checkup1 = CarCheckUpDto("Josip", 2f, 1)
         val checkup2 = CarCheckUpDto("Stef", 2f, 1)
-        val regex = """\"checkups\": [(^{)+{(^})+},(^{)+{(^})+}]""".toRegex()
 
         mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
@@ -208,7 +175,7 @@ class CarsApplicationTests(
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            header{exists("Location")}
+            header { exists("Location") }
         }
 
         mvc.post("/checkups") {
@@ -217,7 +184,7 @@ class CarsApplicationTests(
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            header{exists("Location")}
+            header { exists("Location") }
         }
 
         mvc.post("/checkups") {
@@ -226,7 +193,7 @@ class CarsApplicationTests(
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            header{exists("Location")}
+            header { exists("Location") }
         }
 
         mvc.get("/cars/{id}", 1).andExpect {
@@ -242,4 +209,6 @@ class CarsApplicationTests(
             jsonPath("$.car.checkUps")
         }
     }
+
+
 }
