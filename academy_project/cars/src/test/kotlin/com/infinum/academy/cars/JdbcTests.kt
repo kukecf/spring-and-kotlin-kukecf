@@ -6,6 +6,7 @@ import com.infinum.academy.cars.repository.DBCarCheckUpRepository
 import com.infinum.academy.cars.repository.DBCarRepository
 import com.infinum.academy.cars.resource.Car
 import com.infinum.academy.cars.resource.CarCheckUp
+import com.infinum.academy.cars.resource.CarCheckUpDto
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -18,21 +19,27 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.dao.DuplicateKeyException
+import org.springframework.http.MediaType
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert
 import org.springframework.test.annotation.Rollback
+import org.springframework.test.web.servlet.post
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
+import javax.sql.DataSource
 
 @JdbcTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Rollback
 class JdbcTests @Autowired constructor(
-    private val jdbcTemplate: NamedParameterJdbcTemplate
+    private val jdbcTemplate: NamedParameterJdbcTemplate,
+    private val dataSource: DataSource
 ) {
     private val carRowMapper = RowMapper() { r, _ ->
         Car(
-            r.getLong("carId"),
+            r.getLong("id"),
             r.getLong("ownerId"),
             r.getDate("dateAdded").toLocalDate(),
             r.getString("manufacturerName"),
@@ -52,45 +59,48 @@ class JdbcTests @Autowired constructor(
         )
     }
 
+    private val simpleJdbcInsertCars = SimpleJdbcInsert(dataSource).withTableName("cars")
+    private val simpleJdbcInsertCheckups = SimpleJdbcInsert(dataSource).withTableName("checkups")
+
+    init{
+        simpleJdbcInsertCars.setGeneratedKeyName("id")
+        simpleJdbcInsertCheckups.setGeneratedKeyName("id")
+    }
+
     private fun insertCar(
-        id: Long?,
         serial: String?,
         manName: String?,
         modelName: String?,
         ownerId: Long?,
         year: Int?
-    ) {
-        jdbcTemplate.update(
-            "INSERT INTO cars (carId,ownerId,dateAdded,manufacturerName,modelName,productionYear,serialNumber) VALUES (:id,:ownerId,:date,:manName,:modelName,:year,:serial)",
+    ) : Long {
+        return simpleJdbcInsertCars.executeAndReturnKey(
             mapOf(
-                "id" to id,
-                "serial" to serial,
-                "date" to LocalDate.now(),
-                "manName" to manName,
-                "modelName" to modelName,
                 "ownerId" to ownerId,
-                "year" to year
+                "dateAdded" to LocalDate.now(),
+                "manufacturerName" to manName,
+                "modelName" to modelName,
+                "productionYear" to year,
+                "serialNumber" to serial
             )
-        )
+        ).toLong()
     }
 
-    private fun insertCarCheckUp(id: Long?, worker: String?, price: Float?, carId: Long?) {
-        jdbcTemplate.update(
-            "INSERT INTO checkups (checkUpId,datePerformed,workerName,price,carId) VALUES (:id,:date,:worker,:price,:carId)",
+    private fun insertCarCheckUp(worker: String?, price: Float?, carId: Long?) : Long {
+        return simpleJdbcInsertCheckups.executeAndReturnKey(
             mapOf(
-                "id" to id,
-                "date" to LocalDateTime.now(),
-                "worker" to worker,
+                "datePerformed" to LocalDateTime.now(),
+                "workerName" to worker,
                 "price" to price,
                 "carId" to carId
             )
-        )
+        ).toLong()
     }
 
     @BeforeEach
     fun setUp() {
-        insertCar(4, "72", "Yugo", "GV Sport", 2, 1982)
-        insertCarCheckUp(2, "Jura", 2.0f, 4)
+        val id= insertCar("72", "Yugo", "GV Sport", 2, 1982)
+        insertCarCheckUp( "Jura", 2.0f, id)
     }
 
     @Test
@@ -109,23 +119,15 @@ class JdbcTests @Autowired constructor(
     @DisplayName("should fail in adding second car with same serial number")
     fun test2() {
         assertThatThrownBy {
-            insertCar(5, "72", "Fiat", "128", 2, 1985)
+            insertCar( "72", "Fiat", "128", 2, 1985)
         }.isInstanceOf(DuplicateKeyException::class.java)
-    }
-
-    @Test
-    @DisplayName("should fail in null value exception - cars")
-    fun test3() {
-        assertThatThrownBy {
-            insertCar(null, "72", "Fiat", "128", 2, 1985)
-        }.isInstanceOf(DataIntegrityViolationException::class.java)
     }
 
     @Test
     @DisplayName("should fail in null value exception - cars")
     fun test4() {
         assertThatThrownBy {
-            insertCar(5, "72", null, "128", 2, 1985)
+            insertCar( "72", null, "128", 2, 1985)
         }.isInstanceOf(DataIntegrityViolationException::class.java)
     }
 
@@ -134,7 +136,7 @@ class JdbcTests @Autowired constructor(
     @DisplayName("should fail in null value exception - cars")
     fun test5() {
         assertThatThrownBy {
-            insertCar(5, "72", "Fiat", null, 2, 1985)
+            insertCar( "72", "Fiat", null, 2, 1985)
         }.isInstanceOf(DataIntegrityViolationException::class.java)
     }
 
@@ -142,7 +144,7 @@ class JdbcTests @Autowired constructor(
     @DisplayName("should fail in null value exception - cars")
     fun test6() {
         assertThatThrownBy {
-            insertCar(5, "72", "Fiat", "128", null, 1985)
+            insertCar( "72", "Fiat", "128", null, 1985)
         }.isInstanceOf(DataIntegrityViolationException::class.java)
     }
 
@@ -150,15 +152,7 @@ class JdbcTests @Autowired constructor(
     @DisplayName("should fail in null value exception - cars")
     fun test7() {
         assertThatThrownBy {
-            insertCar(5, "72", "Fiat", "128", 2, null)
-        }.isInstanceOf(DataIntegrityViolationException::class.java)
-    }
-
-    @Test
-    @DisplayName("should fail in null value exception - checkups")
-    fun test8() {
-        assertThatThrownBy {
-            insertCarCheckUp(null, "Jura", 2.0f, 4)
+            insertCar( "72", "Fiat", "128", 2, null)
         }.isInstanceOf(DataIntegrityViolationException::class.java)
     }
 
@@ -166,7 +160,7 @@ class JdbcTests @Autowired constructor(
     @DisplayName("should fail in null value exception - checkups")
     fun test9() {
         assertThatThrownBy {
-            insertCarCheckUp(2, null, 2.0f, 4)
+            insertCarCheckUp( null, 2.0f, 4)
         }.isInstanceOf(DataIntegrityViolationException::class.java)
     }
 
@@ -174,7 +168,7 @@ class JdbcTests @Autowired constructor(
     @DisplayName("should fail in null value exception - checkups")
     fun test10() {
         assertThatThrownBy {
-            insertCarCheckUp(2, "Jura", null, 4)
+            insertCarCheckUp( "Jura", null, 4)
         }.isInstanceOf(DataIntegrityViolationException::class.java)
     }
 
@@ -182,23 +176,32 @@ class JdbcTests @Autowired constructor(
     @DisplayName("should fail in null value exception - checkups")
     fun test11() {
         assertThatThrownBy {
-            insertCarCheckUp(2, "Jura", 2.0f, null)
+            insertCarCheckUp( "Jura", 2.0f, null)
         }.isInstanceOf(DataIntegrityViolationException::class.java)
     }
 
     @Test
     @DisplayName("should return 2 checkups with worker Jura")
     fun test12() {
-        insertCar(6, "76", "Zastava", "101", 2, 1987)
-        insertCarCheckUp(4, "Jura", 2.0f, 6)
-        insertCarCheckUp(5, "Boris", 3.0f, 6)
+        val id= insertCar( "76", "Zastava", "101", 2, 1987)
+        insertCarCheckUp( "Jura", 2.0f, id)
+        insertCarCheckUp("Boris", 3.0f, id)
         assertThat(
             jdbcTemplate.queryForObject(
-                "SELECT count(*) FROM cars JOIN checkups ON cars.carId = checkups.carId WHERE checkups.workerName=:worker GROUP BY checkups.workerName",
+                "SELECT count(*) FROM cars JOIN checkups ON cars.id = checkups.carId WHERE checkups.workerName=:worker GROUP BY checkups.workerName",
                 mapOf("worker" to "Jura"),
                 Int::class.java
             )
         ).isEqualTo(2)
+    }
+
+    @Test
+    @DisplayName("should fail in adding checkup for nonexisting car")
+    @Transactional
+    fun test13() {
+        assertThatThrownBy {
+            insertCarCheckUp( "Josip", 2f, 189)
+        }.isInstanceOf(DataIntegrityViolationException::class.java)
     }
 
 }
