@@ -7,13 +7,17 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
+import javax.sql.DataSource
 
 @Repository
 class DBCarCheckUpRepository(
-    private val jdbcTemplate: NamedParameterJdbcTemplate
+    private val jdbcTemplate: NamedParameterJdbcTemplate,
+    private val dataSource: DataSource
 ) : CarCheckUpRepository {
+
     private val rowMapper = RowMapper() { r, _ ->
         CarCheckUp(
             r.getLong("id"),
@@ -24,17 +28,21 @@ class DBCarCheckUpRepository(
         )
     }
 
+    private val simpleJdbcInsert = SimpleJdbcInsert(dataSource).withTableName("checkups")
+
+    init{
+        simpleJdbcInsert.setGeneratedKeyName("id")
+    }
+
     override fun save(checkup: CarCheckUp): Long {
-        jdbcTemplate.update(
-            "INSERT INTO checkups (datePerformed,workerName,price,carId) VALUES (:date,:worker,:price,:carId)",
+        return simpleJdbcInsert.executeAndReturnKey(
             mapOf(
-                "date" to LocalDateTime.now(),
-                "worker" to checkup.workerName,
+                "datePerformed" to LocalDateTime.now(),
+                "workerName" to checkup.workerName,
                 "price" to checkup.price,
                 "carId" to checkup.carId
             )
-        )
-        return checkup.id
+        ).toLong()
     }
 
     override fun findById(id: Long): CarCheckUp? {

@@ -6,14 +6,18 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.jdbc.core.BeanPropertyRowMapper
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
 import java.time.LocalDateTime
+import javax.sql.DataSource
 
 @Repository
 class DBCarRepository(
-    private val jdbcTemplate: NamedParameterJdbcTemplate
+    private val jdbcTemplate: NamedParameterJdbcTemplate,
+    private val dataSource: DataSource
 ) : CarRepository {
+
     private val rowMapper = RowMapper() { r, _ ->
         Car(
             r.getLong("id"),
@@ -26,19 +30,23 @@ class DBCarRepository(
         )
     }
 
+    private val simpleJdbcInsert = SimpleJdbcInsert(dataSource).withTableName("cars")
+
+    init{
+        simpleJdbcInsert.setGeneratedKeyName("id")
+    }
+
     override fun save(car: Car): Long {
-        jdbcTemplate.update(
-            "INSERT INTO cars (ownerId,dateAdded,manufacturerName,modelName,productionYear,serialNumber) VALUES (:ownerId,:date,:manName,:modelName,:year,:serial)",
+        return simpleJdbcInsert.executeAndReturnKey(
             mapOf(
-                "serial" to car.serialNumber,
-                "date" to car.dateAdded,
-                "manName" to car.manufacturerName,
-                "modelName" to car.modelName,
                 "ownerId" to car.ownerId,
-                "year" to car.productionYear
+                "dateAdded" to car.dateAdded,
+                "manufacturerName" to car.manufacturerName,
+                "modelName" to car.modelName,
+                "productionYear" to car.productionYear,
+                "serialNumber" to car.serialNumber
             )
-        )
-        return car.id
+        ).toLong()
     }
 
     override fun findById(id: Long): Car? {
