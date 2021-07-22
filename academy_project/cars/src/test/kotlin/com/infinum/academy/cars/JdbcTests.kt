@@ -200,4 +200,5 @@ class JdbcTests @Autowired constructor(
             )
         ).isEqualTo(2)
     }
+
 }

@@ -49,6 +49,16 @@ class DBCarCheckUpRepository(
         )
     }
 
+    override fun findAllByCarId(id: Long): List<CarCheckUp> {
+        return jdbcTemplate.query(
+            "SELECT * FROM checkups WHERE carId=:id ORDER BY datePerformed DESC",
+            mapOf(
+                "id" to id,
+            ),
+            rowMapper
+        )
+    }
+
     override fun findAll(): List<CarCheckUp> {
         return jdbcTemplate.query(
             "SELECT * FROM checkups",

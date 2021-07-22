@@ -8,7 +8,7 @@ import java.lang.RuntimeException
 interface CarRepository {
     fun save(car: Car): Long
     fun findById(id: Long): Car?
-    //fun findBySerialNumber(serialNo: String): Car?
+    fun findBySerialNumber(serialNo: String): Car?
     fun findAll(): List<Car>
 }
 

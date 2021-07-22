@@ -53,7 +53,7 @@ class DBCarRepository(
         )
     }
 
-    fun findBySerialNumber(serialNo: String): Car? {
+    override fun findBySerialNumber(serialNo: String): Car? {
         return jdbcTemplate.queryForObject(
             "SELECT * FROM cars WHERE serialNumber = :serial",
             mapOf(

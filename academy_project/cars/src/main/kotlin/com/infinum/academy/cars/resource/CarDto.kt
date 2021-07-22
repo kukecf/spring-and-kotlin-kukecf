@@ -10,8 +10,7 @@ data class CarDto(
     val serialNumber: String
 )
 
-fun CarDto.toDomainModel(id: Long) = Car(
-    carId = id,
+fun CarDto.toDomainModel() = Car(
     ownerId = ownerId,
     dateAdded = LocalDate.now(),
     manufacturerName = manufacturerName,

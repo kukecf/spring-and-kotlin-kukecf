@@ -3,6 +3,7 @@ package com.infinum.academy.cars.controllers
 import com.infinum.academy.cars.resource.Car
 import com.infinum.academy.cars.resource.CarCheckUp
 import com.infinum.academy.cars.resource.CarCheckUpDto
+import com.infinum.academy.cars.services.CarCheckUpService
 import com.infinum.academy.cars.services.CarService
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -16,27 +17,19 @@ import java.net.URI
 @Controller
 @RequestMapping("/checkups")
 class CarCheckUpController(
-    private val service: CarService
+    private val service: CarCheckUpService
 ) {
-    @GetMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @GetMapping
     fun getAllCarCheckUps(): ResponseEntity<List<CarCheckUp>> =
         ResponseEntity.ok(service.getAllCheckUps())
 
     @PostMapping
-    fun addNewCarCheckUp(@RequestBody checkUpDto: CarCheckUpDto): ResponseEntity<String> {
+    fun addNewCarCheckUp(@RequestBody checkUpDto: CarCheckUpDto): ResponseEntity<Unit> {
         val id = service.addCarCheckUp(checkUpDto)
-        return ResponseEntity.created(URI("http://localhost:8080/checkups/$id")).build()
+        return ResponseEntity.created(URI("http://localhost:8080/checkups/created/$id")).build()
     }
 
     @GetMapping("/{carId}", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun allCheckUpsForCar(@PathVariable carId: Long): ResponseEntity<List<CarCheckUp>> {
-        val carDetails = service.getCarDetails(carId)
-        return ResponseEntity.ok(carDetails.checkUps)
-    }
-
-    @GetMapping("/car/{checkUpId}", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun carForCheckUp(@PathVariable checkUpId: Long): ResponseEntity<Car> {
-        val checkUp = service.getCarCheckUp(checkUpId)
-        return ResponseEntity.ok(service.getCar(checkUp.carId))
-    }
+    fun allCheckUpsForCar(@PathVariable carId: Long): ResponseEntity<List<CarCheckUp>> =
+        ResponseEntity.ok(service.getAllCheckUpsForCarId(carId))
 }
