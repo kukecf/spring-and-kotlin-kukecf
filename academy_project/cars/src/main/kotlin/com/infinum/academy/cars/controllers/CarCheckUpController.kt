@@ -29,7 +29,7 @@ class CarCheckUpController(
         return ResponseEntity.created(URI("http://localhost:8080/checkups/created/$id")).build()
     }
 
-    @GetMapping("/{carId}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    @GetMapping("/car/{carId}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun allCheckUpsForCar(@PathVariable carId: Long): ResponseEntity<List<CarCheckUp>> =
         ResponseEntity.ok(service.getAllCheckUpsForCarId(carId))
 }

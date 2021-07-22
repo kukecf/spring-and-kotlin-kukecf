@@ -6,20 +6,15 @@ import com.infinum.academy.cars.repository.CarRepository
 import com.infinum.academy.cars.resource.CarCheckUp
 import com.infinum.academy.cars.resource.CarCheckUpDto
 import com.infinum.academy.cars.resource.toDomainModel
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 
 @Service
 class CarCheckUpService(
-    @Qualifier("db") private val carRepo: CarRepository,
-    @Qualifier("db") private val checkUpRepo: CarCheckUpRepository
+    private val carRepo: CarRepository,
+    private val checkUpRepo: CarCheckUpRepository
 ) {
     fun addCarCheckUp(checkUpDto: CarCheckUpDto): Long {
-        val id = (checkUpRepo.findAll().maxOfOrNull { checkup -> checkup.checkUpId } ?: 0) + 1
-        val checkUp = checkUpDto.toDomainModel(id)
-        if (carIdExists(checkUp.carId).not()) {
-            throw CarCheckUpConflictException("Failed to add checkup $checkUp to car with ID ${checkUp.carId}")
-        }
+        val checkUp = checkUpDto.toDomainModel()
         return checkUpRepo.save(checkUp)
     }
 
@@ -29,14 +24,7 @@ class CarCheckUpService(
 
     fun getAllCheckUps(): List<CarCheckUp> = checkUpRepo.findAll()
 
-    fun getAllCheckUpsForCarId(id:Long):List<CarCheckUp> =
+    fun getAllCheckUpsForCarId(id: Long): List<CarCheckUp> =
         checkUpRepo.findAllByCarId(id)
-
-
-    private fun carIdExists(id: Long): Boolean =
-        carRepo.findAll()
-            .any {
-                it.carId == id
-            }
 
 }

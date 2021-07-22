@@ -14,7 +14,7 @@ import java.net.URI
 class CarController(
     private val service: CarService
 ) {
-    @GetMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @GetMapping
     fun getAllCars(): ResponseEntity<List<Car>> =
         ResponseEntity.ok(service.getAllCars())
 

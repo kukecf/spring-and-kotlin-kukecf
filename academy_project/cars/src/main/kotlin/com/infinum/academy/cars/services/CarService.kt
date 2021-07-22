@@ -11,8 +11,8 @@ import org.springframework.web.server.ResponseStatusException
 
 @Service
 class CarService(
-    @Qualifier("db") private val carRepo: CarRepository,
-    @Qualifier("db") private val checkUpRepo: CarCheckUpRepository
+    private val carRepo: CarRepository,
+    private val checkUpRepo: CarCheckUpRepository
 ) {
     fun addCar(carDto: CarDto): Long {
         val car = carDto.toDomainModel()

@@ -11,13 +11,12 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Repository
-@Qualifier("db")
 class DBCarRepository(
     private val jdbcTemplate: NamedParameterJdbcTemplate
 ) : CarRepository {
     private val rowMapper = RowMapper() { r, _ ->
         Car(
-            r.getLong("carId"),
+            r.getLong("id"),
             r.getLong("ownerId"),
             r.getDate("dateAdded").toLocalDate(),
             r.getString("manufacturerName"),
@@ -29,9 +28,8 @@ class DBCarRepository(
 
     override fun save(car: Car): Long {
         jdbcTemplate.update(
-            "INSERT INTO cars (carId,ownerId,dateAdded,manufacturerName,modelName,productionYear,serialNumber) VALUES (:id,:ownerId,:date,:manName,:modelName,:year,:serial)",
+            "INSERT INTO cars (ownerId,dateAdded,manufacturerName,modelName,productionYear,serialNumber) VALUES (:ownerId,:date,:manName,:modelName,:year,:serial)",
             mapOf(
-                "id" to car.carId,
                 "serial" to car.serialNumber,
                 "date" to car.dateAdded,
                 "manName" to car.manufacturerName,
@@ -40,12 +38,12 @@ class DBCarRepository(
                 "year" to car.productionYear
             )
         )
-        return car.carId
+        return car.id
     }
 
     override fun findById(id: Long): Car? {
         return jdbcTemplate.queryForObject(
-            "SELECT * FROM cars WHERE carId = :id",
+            "SELECT * FROM cars WHERE id = :id",
             mapOf(
                 "id" to id,
             ),

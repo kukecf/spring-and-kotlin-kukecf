@@ -11,13 +11,12 @@ import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
 @Repository
-@Qualifier("db")
 class DBCarCheckUpRepository(
     private val jdbcTemplate: NamedParameterJdbcTemplate
 ) : CarCheckUpRepository {
     private val rowMapper = RowMapper() { r, _ ->
         CarCheckUp(
-            r.getLong("checkUpId"),
+            r.getLong("id"),
             r.getTimestamp("datePerformed").toLocalDateTime(),
             r.getString("workerName"),
             r.getFloat("price"),
@@ -27,21 +26,20 @@ class DBCarCheckUpRepository(
 
     override fun save(checkup: CarCheckUp): Long {
         jdbcTemplate.update(
-            "INSERT INTO checkups (checkUpId,datePerformed,workerName,price,carId) VALUES (:id,:date,:worker,:price,:carId)",
+            "INSERT INTO checkups (datePerformed,workerName,price,carId) VALUES (:date,:worker,:price,:carId)",
             mapOf(
-                "id" to checkup.checkUpId,
                 "date" to LocalDateTime.now(),
                 "worker" to checkup.workerName,
                 "price" to checkup.price,
                 "carId" to checkup.carId
             )
         )
-        return checkup.checkUpId
+        return checkup.id
     }
 
     override fun findById(id: Long): CarCheckUp? {
         return jdbcTemplate.queryForObject(
-            "SELECT * FROM checkups WHERE checkUpId = :id",
+            "SELECT * FROM checkups WHERE id = :id",
             mapOf(
                 "id" to id,
             ),
