@@ -8,8 +8,7 @@ data class CarCheckUpDto(
     val carId: Long
 )
 
-fun CarCheckUpDto.toDomainModel(id: Long) = CarCheckUp(
-    checkUpId = id,
+fun CarCheckUpDto.toDomainModel() = CarCheckUp(
     datePerformed = LocalDateTime.now(),
     workerName = workerName,
     price = price,

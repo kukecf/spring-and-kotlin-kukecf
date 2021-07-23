@@ -3,6 +3,7 @@ package com.infinum.academy.cars
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.infinum.academy.cars.resource.CarCheckUp
 import com.infinum.academy.cars.repository.CarCheckUpNotFoundException
+import com.infinum.academy.cars.services.CarCheckUpService
 import com.infinum.academy.cars.services.CarService
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
@@ -18,12 +19,13 @@ class CarsSliceTests @Autowired constructor(
     private val mapper: ObjectMapper
 ) {
     @MockkBean
-    lateinit var service: CarService
+    lateinit var carService: CarService
+    lateinit var checkupService : CarCheckUpService
 
     @BeforeEach
     fun setUp() {
         every {
-            service.getCarCheckUp(1)
+            checkupService.getCarCheckUp(1)
         } returns CarCheckUp(
             1,
             LocalDateTime.now(),
@@ -33,15 +35,15 @@ class CarsSliceTests @Autowired constructor(
         )
 
         every {
-            service.getCarCheckUp(2)
+            checkupService.getCarCheckUp(2)
         } throws CarCheckUpNotFoundException("")
 
         every {
-            service.addCar(any())
+            carService.addCar(any())
         } returns 1
 
         every {
-            service.addCarCheckUp(any())
+            checkupService.addCarCheckUp(any())
         } returns 1
     }
 
