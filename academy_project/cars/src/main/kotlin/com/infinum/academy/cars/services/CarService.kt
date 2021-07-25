@@ -8,6 +8,7 @@ import com.infinum.academy.cars.repository.CarNotFoundException
 import com.infinum.academy.cars.repository.CarRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 
 @Service
@@ -17,21 +18,18 @@ class CarService(
 ) {
     fun addCar(carDto: CarDto): Long {
         val car = carDto.toDomainModel()
-        return carRepo.save(car)
+        return carRepo.save(car).id
     }
 
     private fun getCar(carId: Long): Car =
         carRepo.findById(carId) ?: throw CarNotFoundException("Car with ID $carId does not exist!")
 
     fun getCarDetails(carId: Long): Car {
-        return getCar(carId).copy(checkUps=checkUpRepo.findAllByCarId(carId))
+        return getCar(carId).copy(checkUps=checkUpRepo.findAllByCarIdOrderByDatePerformedDesc(carId))
     }
 
     fun getCarBySerial(serNo: String): Car =
         carRepo.findBySerialNumber(serNo) ?: throw CarNotFoundException("Car with serial number $serNo does not exist!")
-
-    fun getAllCars(): List<Car> =
-        carRepo.findAll()
 
     fun getAllCars(pageable: Pageable): Page<Car> =
         carRepo.findAll(pageable)

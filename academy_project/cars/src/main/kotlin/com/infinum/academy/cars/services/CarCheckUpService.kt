@@ -15,7 +15,7 @@ class CarCheckUpService(
 ) {
     fun addCarCheckUp(checkUpDto: CarCheckUpDto): Long {
         val checkUp = checkUpDto.toDomainModel()
-        return checkUpRepo.save(checkUp)
+        return checkUpRepo.save(checkUp).id
     }
 
     fun getCarCheckUp(checkUpId: Long): CarCheckUp =

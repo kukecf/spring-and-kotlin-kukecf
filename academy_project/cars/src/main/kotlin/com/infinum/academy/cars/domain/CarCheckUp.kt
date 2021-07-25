@@ -17,6 +17,7 @@ data class CarCheckUp(
 
     val price: Float,
 
-    @ManyToOne
+    //@ManyToOne(fetch = FetchType.LAZY, optional = false)
+    //@JoinColumn(name = "car_id", nullable = false)
     val carId: Long
 )

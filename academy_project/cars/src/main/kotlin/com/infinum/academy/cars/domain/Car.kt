@@ -4,7 +4,7 @@ import java.time.LocalDate
 import javax.persistence.*
 
 @Entity
-@Table(name = "cars")
+@Table(name = "cars", uniqueConstraints = [UniqueConstraint(columnNames = ["serialNumber"])])
 data class Car(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CAR_SEQ")
@@ -23,7 +23,12 @@ data class Car(
 
     val serialNumber: String,
 
-    @ElementCollection
-    @CollectionTable(name = "car_checkups", joinColumns = [JoinColumn(name = "carId")])
+    //@ElementCollection
+    //@CollectionTable(name = "checkups", joinColumns = [JoinColumn(name = "carId")])
+
+    // znam da je ovo rjesenje vjerojatno lose, ali je li ovo iznad bolje rjesenje? nesto trece?
+
+    @OneToMany(targetEntity=CarCheckUp::class)
+    @JoinColumn(name="carId")
     val checkUps: List<CarCheckUp> = emptyList()
 )
