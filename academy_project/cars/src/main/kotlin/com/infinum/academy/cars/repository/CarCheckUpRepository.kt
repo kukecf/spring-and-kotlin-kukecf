@@ -12,9 +12,10 @@ interface CarCheckUpRepository : Repository<CarCheckUp, Long> {
     fun save(checkup: CarCheckUp): Long
     fun findById(id: Long): CarCheckUp?
     fun findAllByCarId(carId: Long): List<CarCheckUp>
-    fun findAllByCarId(carId: Long, pageable:Pageable): Page<CarCheckUp>
+    fun findAllByCarId(carId: Long, pageable: Pageable): Page<CarCheckUp>
     fun findAll(): List<CarCheckUp>
-    fun findAll(pageable:Pageable) : Page<CarCheckUp>
+    fun findAll(pageable: Pageable): Page<CarCheckUp>
     @Transactional
+    fun deleteById(id: Long): Long
     fun deleteAll()
 }

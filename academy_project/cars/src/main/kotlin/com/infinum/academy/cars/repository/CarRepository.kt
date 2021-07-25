@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 
-//@org.springframework.stereotype.Repository
 interface CarRepository : Repository<Car, Long> {
     fun save(car: Car): Long
     fun findById(id: Long): Car?
@@ -17,6 +16,7 @@ interface CarRepository : Repository<Car, Long> {
     fun findAll(pageAble: Pageable): Page<Car>
 
     @Transactional
+    fun deleteById(id:Long): Long
     fun deleteAll()
 }
 
