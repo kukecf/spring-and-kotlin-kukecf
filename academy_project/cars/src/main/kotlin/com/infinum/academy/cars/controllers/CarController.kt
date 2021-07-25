@@ -31,9 +31,4 @@ class CarController(
         return ResponseEntity.ok(service.getCarDetails(id))
     }
 
-    @GetMapping("/serial/{serNo}", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun serial(@PathVariable serNo: String): ResponseEntity<Car> {
-        return ResponseEntity.ok(service.getCarBySerial(serNo))
-    }
-
 }

@@ -1,5 +1,6 @@
 package com.infinum.academy.cars.domain
 
+import org.springframework.data.repository.cdi.Eager
 import java.time.LocalDate
 import javax.persistence.*
 
@@ -28,7 +29,7 @@ data class Car(
 
     // znam da je ovo rjesenje vjerojatno lose, ali je li ovo iznad bolje rjesenje? nesto trece?
 
-    @OneToMany(targetEntity=CarCheckUp::class)
-    @JoinColumn(name="carId")
+    @OneToMany(targetEntity=CarCheckUp::class, fetch = FetchType.EAGER)
+    //@JoinColumn(name="carId")
     val checkUps: List<CarCheckUp> = emptyList()
 )

@@ -1,7 +1,9 @@
 package com.infinum.academy.cars.dto
 
+import com.infinum.academy.cars.domain.Car
 import com.infinum.academy.cars.domain.CarCheckUp
 import com.infinum.academy.cars.repository.CarCheckUpRepository
+import com.infinum.academy.cars.repository.CarRepository
 import java.time.LocalDateTime
 
 data class CarCheckUpDto(
@@ -15,5 +17,6 @@ fun CarCheckUpDto.toDomainModel() = CarCheckUp(
     workerName = workerName,
     price = price,
     carId = carId
+    //car = car
 )
 

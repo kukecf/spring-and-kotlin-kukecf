@@ -12,8 +12,7 @@ import org.springframework.web.server.ResponseStatusException
 interface CarRepository : Repository<Car, Long> {
     fun save(car: Car): Car
     fun findById(id: Long): Car?
-    fun findBySerialNumber(serialNo: String): Car?
-    fun findAll(): List<Car>
+
     fun findAll(pageable: Pageable): Page<Car>
 
     @Transactional

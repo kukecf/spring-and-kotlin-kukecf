@@ -20,4 +20,5 @@ data class CarCheckUp(
     //@ManyToOne(fetch = FetchType.LAZY, optional = false)
     //@JoinColumn(name = "car_id", nullable = false)
     val carId: Long
+    //val car: Car
 )
