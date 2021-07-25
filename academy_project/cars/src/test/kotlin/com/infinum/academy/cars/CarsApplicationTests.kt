@@ -1,8 +1,8 @@
 package com.infinum.academy.cars
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.infinum.academy.cars.resource.CarCheckUpDto
-import com.infinum.academy.cars.resource.CarDto
+import com.infinum.academy.cars.dto.CarCheckUpDto
+import com.infinum.academy.cars.dto.CarDto
 import io.mockk.InternalPlatformDsl.toStr
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName

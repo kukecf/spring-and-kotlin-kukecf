@@ -1,5 +1,6 @@
-package com.infinum.academy.cars.resource
+package com.infinum.academy.cars.dto
 
+import com.infinum.academy.cars.domain.CarCheckUp
 import java.time.LocalDateTime
 
 data class CarCheckUpDto(

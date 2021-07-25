@@ -1,13 +1,14 @@
 package com.infinum.academy.cars.services
 
+import com.infinum.academy.cars.domain.Car
+import com.infinum.academy.cars.dto.CarDto
+import com.infinum.academy.cars.dto.toDomainModel
 import com.infinum.academy.cars.repository.CarCheckUpRepository
 import com.infinum.academy.cars.repository.CarNotFoundException
 import com.infinum.academy.cars.repository.CarRepository
-import com.infinum.academy.cars.resource.*
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.http.HttpStatus
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
-import org.springframework.web.server.ResponseStatusException
 
 @Service
 class CarService(
@@ -31,7 +32,7 @@ class CarService(
 
     fun getAllCars(): List<Car> =
         carRepo.findAll()
-}
 
-class CarConflictException(message: String) : ResponseStatusException(HttpStatus.CONFLICT, message)
-class CarCheckUpConflictException(message: String) : ResponseStatusException(HttpStatus.CONFLICT, message)
+    fun getAllCars(pageable: Pageable): Page<Car> =
+        carRepo.findAll(pageable)
+}

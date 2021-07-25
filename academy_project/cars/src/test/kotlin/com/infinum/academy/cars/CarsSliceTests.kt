@@ -1,7 +1,7 @@
 package com.infinum.academy.cars
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.infinum.academy.cars.resource.CarCheckUp
+import com.infinum.academy.cars.domain.CarCheckUp
 import com.infinum.academy.cars.repository.CarCheckUpNotFoundException
 import com.infinum.academy.cars.services.CarCheckUpService
 import com.infinum.academy.cars.services.CarService
