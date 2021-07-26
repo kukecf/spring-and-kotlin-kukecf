@@ -3,16 +3,14 @@ package com.infinum.academy.cars
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.infinum.academy.cars.dto.CarCheckUpDto
 import com.infinum.academy.cars.dto.CarDto
+import com.infinum.academy.cars.dto.toCarCheckUp
 import io.mockk.InternalPlatformDsl.toStr
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.shadow.com.univocity.parsers.conversions.Conversions.string
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.annotation.Rollback
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
@@ -31,34 +29,38 @@ class CarsApplicationTests @Autowired constructor(
 ) {
 
     @Test
-    @DisplayName("should find car by serial number")
+    @DisplayName("should return all cars")
     @Transactional
     fun test1() {
-        val car = CarDto(3, "Peugeot", "305", 2004, "89")
-
-        mvc.post("/cars") {
+        val car = CarDto(1, "Peugeot", "305", 2004, "89")
+        val car2 = CarDto(4, "Dacia", "Sandero", 2010, "98")
+        val result1 = mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car)
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }
-            header { stringValues("Location", "http://localhost:8080/cars/created/1") }
-        }
+            header { exists("Location") }
+        }.andReturn()
 
-        mvc.get("/cars/serial/89").andExpect {
+        val id1 = result1.response.getHeaderValue("Location").toStr()
+            .removePrefix("http://localhost:8080/cars/created/")
+
+        val result2 = mvc.post("/cars") {
+            contentType = MediaType.APPLICATION_JSON
+            content = mapper.writeValueAsString(car2)
+            accept = MediaType.APPLICATION_JSON
+        }.andExpect {
             status { is2xxSuccessful() }
-            content { contentType(MediaType.APPLICATION_JSON) }
-            jsonPath("$.id") { value("1") }
-            jsonPath("$.ownerId") { value("3") }
-            jsonPath("$.dateAdded") { value(LocalDate.now().toStr()) }
-            jsonPath("$.manufacturerName") { value("Peugeot") }
-            jsonPath("$.modelName") { value("305") }
-            jsonPath("$.productionYear") { value("2004") }
-            jsonPath("$.serialNumber") { value("89") }
-            jsonPath("$.checkUps") {
-                isArray()
-                isEmpty()
-            }
+            header { exists("Location") }
+        }.andReturn()
+
+        val id2 = result2.response.getHeaderValue("Location").toStr()
+            .removePrefix("http://localhost:8080/cars/created/")
+
+        mvc.get("/cars").andExpect{
+            status { is2xxSuccessful() }
+            content{mapper.writeValueAsString(listOf(car.toCarCheckUp(),car2.toCarCheckUp()))}
         }
     }
 
@@ -73,7 +75,10 @@ class CarsApplicationTests @Autowired constructor(
             content = mapper.writeValueAsString(car)
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
-            status { is2xxSuccessful() }
+            status {
+                is2xxSuccessful()
+            }
+
         }
     }
 
@@ -262,5 +267,7 @@ class CarsApplicationTests @Autowired constructor(
             }
         }
     }
+
+
 
 }

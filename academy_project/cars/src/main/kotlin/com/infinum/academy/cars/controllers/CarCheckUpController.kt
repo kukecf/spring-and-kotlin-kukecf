@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import java.net.URI
+import javax.servlet.http.HttpServletResponse
 
 @Controller
 @RequestMapping("/checkups")
@@ -19,7 +20,7 @@ class CarCheckUpController(
     @PostMapping
     fun addNewCarCheckUp(@RequestBody checkUpDto: CarCheckUpDto): ResponseEntity<Unit> {
         val id = service.addCarCheckUp(checkUpDto)
-        return ResponseEntity.created(URI("http://localhost:8080/checkups/created/$id")).build()
+        return ResponseEntity.created(URI("http://localhost:8080/checkups/$id")).build()
     }
 
     @GetMapping("/car/{carId}", produces = [MediaType.APPLICATION_JSON_VALUE])

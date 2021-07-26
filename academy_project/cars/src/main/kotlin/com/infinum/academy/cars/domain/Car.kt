@@ -22,14 +22,5 @@ data class Car(
 
     val productionYear: Int,
 
-    val serialNumber: String,
-
-    //@ElementCollection
-    //@CollectionTable(name = "checkups", joinColumns = [JoinColumn(name = "carId")])
-
-    // znam da je ovo rjesenje vjerojatno lose, ali je li ovo iznad bolje rjesenje? nesto trece?
-
-    @OneToMany(targetEntity=CarCheckUp::class, fetch = FetchType.EAGER)
-    //@JoinColumn(name="carId")
-    val checkUps: List<CarCheckUp> = emptyList()
+    val serialNumber: String
 )

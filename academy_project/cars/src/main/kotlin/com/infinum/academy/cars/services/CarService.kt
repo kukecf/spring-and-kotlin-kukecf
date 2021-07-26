@@ -1,8 +1,9 @@
 package com.infinum.academy.cars.services
 
 import com.infinum.academy.cars.domain.Car
+import com.infinum.academy.cars.dto.CarDetailsDto
 import com.infinum.academy.cars.dto.CarDto
-import com.infinum.academy.cars.dto.toDomainModel
+import com.infinum.academy.cars.dto.toCarCheckUp
 import com.infinum.academy.cars.repository.CarCheckUpRepository
 import com.infinum.academy.cars.repository.CarNotFoundException
 import com.infinum.academy.cars.repository.CarRepository
@@ -16,15 +17,15 @@ class CarService(
     private val checkUpRepo: CarCheckUpRepository
 ) {
     fun addCar(carDto: CarDto): Long {
-        val car = carDto.toDomainModel()
+        val car = carDto.toCarCheckUp()
         return carRepo.save(car).id
     }
 
     private fun getCar(carId: Long): Car =
-        carRepo.findById(carId) ?: throw CarNotFoundException("Car with ID $carId does not exist!")
+        carRepo.findById(carId) ?: throw CarNotFoundException(carId)
 
-    fun getCarDetails(carId: Long): Car {
-        return getCar(carId).copy(checkUps=checkUpRepo.findAllCheckupsForDetails(carId))
+    fun getCarDetails(carId: Long): CarDetailsDto {
+        return CarDetailsDto(getCar(carId),checkUpRepo.findAllCheckupsForDetails(carId))
     }
 
     fun getAllCars(pageable: Pageable): Page<Car> {

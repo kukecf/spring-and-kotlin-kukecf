@@ -12,11 +12,10 @@ data class CarCheckUpDto(
     val carId: Long
 )
 
-fun CarCheckUpDto.toDomainModel() = CarCheckUp(
+fun CarCheckUpDto.toCarCheckUp(carFetcher:(Long)->Car) = CarCheckUp(
     datePerformed = LocalDateTime.now(),
     workerName = workerName,
     price = price,
-    carId = carId
-    //car = car
+    car = carFetcher.invoke(this.carId)
 )
 
