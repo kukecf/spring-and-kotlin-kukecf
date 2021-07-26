@@ -10,6 +10,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
 
 @Controller
@@ -25,7 +26,12 @@ class CarController(
     @PostMapping
     fun addNewCar(@RequestBody carDto: AddCarDto): ResponseEntity<Unit> {
         val id = service.addCar(carDto)
-        return ResponseEntity.created(URI("http://localhost:8080/cars/$id")).build()
+        val location= ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(id)
+            .toUri()
+        return ResponseEntity.created(location).build()
     }
 
     @GetMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])

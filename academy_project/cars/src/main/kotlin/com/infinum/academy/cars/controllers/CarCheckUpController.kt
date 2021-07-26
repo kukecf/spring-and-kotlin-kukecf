@@ -9,6 +9,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
 
 @Controller
@@ -19,7 +20,12 @@ class CarCheckUpController(
     @PostMapping
     fun addCarCheckUp(@RequestBody checkUpDto: AddCarCheckUpDto): ResponseEntity<Unit> {
         val id = service.addCarCheckUp(checkUpDto)
-        return ResponseEntity.created(URI("http://localhost:8080/checkups/$id")).build()
+        val location=ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(id)
+            .toUri()
+        return ResponseEntity.created(location).build()
     }
 
     //mozda i ovdje vratiti checkUpDetailsDto?
