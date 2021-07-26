@@ -2,6 +2,9 @@ package com.infinum.academy.cars
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.infinum.academy.cars.domain.CarCheckUp
+import com.infinum.academy.cars.dto.AddCarCheckUpDto
+import com.infinum.academy.cars.dto.AddCarDto
+import com.infinum.academy.cars.dto.toCar
 import com.infinum.academy.cars.repository.CarCheckUpNotFoundException
 import com.infinum.academy.cars.services.CarCheckUpService
 import com.infinum.academy.cars.services.CarService
@@ -24,19 +27,26 @@ class CarsSliceTests @Autowired constructor(
 
     @BeforeEach
     fun setUp() {
+        val car=AddCarDto(
+            1,
+            "Peugeot",
+            "305",
+            2002,
+            "2"
+        ).toCar()
         every {
             checkupService.getCarCheckUp(1)
         } returns CarCheckUp(
-            1,
+            2,
             LocalDateTime.now(),
             "Josip",
             2.1f,
-            1
+            car
         )
 
         every {
             checkupService.getCarCheckUp(2)
-        } throws CarCheckUpNotFoundException("")
+        } throws CarCheckUpNotFoundException(2)
 
         every {
             carService.addCar(any())

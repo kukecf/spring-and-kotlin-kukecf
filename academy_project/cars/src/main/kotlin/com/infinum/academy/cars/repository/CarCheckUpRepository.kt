@@ -14,15 +14,12 @@ interface CarCheckUpRepository : Repository<CarCheckUp, Long> {
     fun save(checkup: CarCheckUp): CarCheckUp
     fun saveAll(checkups: Iterable<CarCheckUp>): Iterable<CarCheckUp>
     fun findById(id: Long): CarCheckUp?
+    fun findAll(): List<CarCheckUp>
 
     @Query("select check from CarCheckUp check join fetch Car car on car.id=check.car.id where check.car.id = :carId order by check.datePerformed desc")
     fun findAllCheckupsForDetails(carId: Long): List<CarCheckUp>
 
-    fun findAllByCar(car: Car, pageable:Pageable): Page<CarCheckUp>
+    fun findAllByCar(car: Car, pageable: Pageable): Page<CarCheckUp>
 
-    fun findAll(pageable: Pageable): Page<CarCheckUp>
-
-    @Transactional
-    fun deleteById(id: Long): Long
     fun deleteAll()
 }

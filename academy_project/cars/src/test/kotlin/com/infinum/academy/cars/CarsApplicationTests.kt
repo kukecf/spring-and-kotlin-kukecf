@@ -1,8 +1,9 @@
 package com.infinum.academy.cars
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.infinum.academy.cars.dto.CarCheckUpDto
-import com.infinum.academy.cars.dto.CarDto
+import com.infinum.academy.cars.dto.AddCarCheckUpDto
+import com.infinum.academy.cars.dto.AddCarDto
+import com.infinum.academy.cars.dto.toCar
 import com.infinum.academy.cars.dto.toCarCheckUp
 import io.mockk.InternalPlatformDsl.toStr
 import org.junit.jupiter.api.DisplayName
@@ -32,8 +33,8 @@ class CarsApplicationTests @Autowired constructor(
     @DisplayName("should return all cars")
     @Transactional
     fun test1() {
-        val car = CarDto(1, "Peugeot", "305", 2004, "89")
-        val car2 = CarDto(4, "Dacia", "Sandero", 2010, "98")
+        val car = AddCarDto(1, "Peugeot", "305", 2004, "89")
+        val car2 = AddCarDto(4, "Dacia", "Sandero", 2010, "98")
         val result1 = mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car)
@@ -44,7 +45,7 @@ class CarsApplicationTests @Autowired constructor(
         }.andReturn()
 
         val id1 = result1.response.getHeaderValue("Location").toStr()
-            .removePrefix("http://localhost:8080/cars/created/")
+            .removePrefix("http://localhost:8080/cars/")
 
         val result2 = mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
@@ -56,11 +57,11 @@ class CarsApplicationTests @Autowired constructor(
         }.andReturn()
 
         val id2 = result2.response.getHeaderValue("Location").toStr()
-            .removePrefix("http://localhost:8080/cars/created/")
+            .removePrefix("http://localhost:8080/cars/")
 
         mvc.get("/cars").andExpect{
             status { is2xxSuccessful() }
-            content{mapper.writeValueAsString(listOf(car.toCarCheckUp(),car2.toCarCheckUp()))}
+            jsonPath("content"){value(mapper.writeValueAsString(listOf(car.toCar(),car2.toCar())))}
         }
     }
 
@@ -68,7 +69,7 @@ class CarsApplicationTests @Autowired constructor(
     @DisplayName("should add car and check its addition")
     @Transactional
     fun test2() {
-        val car = CarDto(1, "Peugeot", "305", 2004, "89")
+        val car = AddCarDto(1, "Peugeot", "305", 2004, "89")
 
         mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
@@ -86,7 +87,7 @@ class CarsApplicationTests @Autowired constructor(
     @DisplayName("should add car and check its details")
     @Transactional
     fun test3() {
-        val car = CarDto(1, "Peugeot", "305", 2004, "89")
+        val car = AddCarDto(1, "Peugeot", "305", 2004, "89")
 
         val result = mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
@@ -98,7 +99,7 @@ class CarsApplicationTests @Autowired constructor(
         }.andReturn()
 
         val id = result.response.getHeaderValue("Location").toStr()
-            .removePrefix("http://localhost:8080/cars/created/")
+            .removePrefix("http://localhost:8080/cars/")
 
         mvc.get("/cars/{id}", id).andExpect {
             jsonPath("$.id") { value(id) }
@@ -118,8 +119,8 @@ class CarsApplicationTests @Autowired constructor(
     @DisplayName("should add second car and not alter details of first")
     @Transactional
     fun test4() {
-        val car1 = CarDto(1, "Peugeot", "305", 2004, "889")
-        val car2 = CarDto(2, "Fiat", "Punto", 2007, "988")
+        val car1 = AddCarDto(1, "Peugeot", "305", 2004, "889")
+        val car2 = AddCarDto(2, "Fiat", "Punto", 2007, "988")
 
         val result1 = mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
@@ -131,7 +132,7 @@ class CarsApplicationTests @Autowired constructor(
         }.andReturn()
 
         val id1 = result1.response.getHeaderValue("Location").toStr()
-            .removePrefix("http://localhost:8080/cars/created/")
+            .removePrefix("http://localhost:8080/cars/")
 
         val result2 = mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
@@ -143,7 +144,7 @@ class CarsApplicationTests @Autowired constructor(
         }.andReturn()
 
         val id2 = result2.response.getHeaderValue("Location").toStr()
-            .removePrefix("http://localhost:8080/cars/created/")
+            .removePrefix("http://localhost:8080/cars/")
 
         mvc.get("/cars/{id}", id1).andExpect {
             jsonPath("$.id") { value(id1) }
@@ -176,7 +177,7 @@ class CarsApplicationTests @Autowired constructor(
     @DisplayName("should add car and checkup for it")
     @Transactional
     fun test5() {
-        val car = CarDto(3, "Peugeot", "305", 2004, "89")
+        val car = AddCarDto(3, "Peugeot", "305", 2004, "89")
 
 
         val result=mvc.post("/cars") {
@@ -190,9 +191,9 @@ class CarsApplicationTests @Autowired constructor(
             }
         }.andReturn()
         val id = result.response.getHeaderValue("Location").toStr()
-            .removePrefix("http://localhost:8080/cars/created/")
+            .removePrefix("http://localhost:8080/cars/")
 
-        val checkup = CarCheckUpDto("Josip", 2f, id.toLong())
+        val checkup = AddCarCheckUpDto("Josip", 2f, id.toLong())
 
         mvc.post("/checkups") {
             contentType = MediaType.APPLICATION_JSON
@@ -211,7 +212,7 @@ class CarsApplicationTests @Autowired constructor(
     @DisplayName("should generate list of checkups for the same car")
     @Transactional
     fun test6() {
-        val car = CarDto(3, "Peugeot", "305", 2004, "89")
+        val car = AddCarDto(3, "Peugeot", "305", 2004, "89")
 
 
         val result = mvc.post("/cars") {
@@ -224,10 +225,10 @@ class CarsApplicationTests @Autowired constructor(
         }.andReturn()
 
         val id = result.response.getHeaderValue("Location").toStr()
-            .removePrefix("http://localhost:8080/cars/created/")
+            .removePrefix("http://localhost:8080/cars/")
 
-        val checkup1 = CarCheckUpDto("Josip", 2f, id.toLong())
-        val checkup2 = CarCheckUpDto("Stef", 2f, id.toLong())
+        val checkup1 = AddCarCheckUpDto("Josip", 2f, id.toLong())
+        val checkup2 = AddCarCheckUpDto("Stef", 2f, id.toLong())
 
         val result2 = mvc.post("/checkups") {
             contentType = MediaType.APPLICATION_JSON
@@ -238,7 +239,7 @@ class CarsApplicationTests @Autowired constructor(
             header { exists("Location") }
         }.andReturn()
 
-        assert(result2.response.getHeaderValue("Location").toStr().contains("http://localhost:8080/checkups/created/"))
+        assert(result2.response.getHeaderValue("Location").toStr().contains("http://localhost:8080/checkups/"))
 
         val result3 = mvc.post("/checkups") {
             contentType = MediaType.APPLICATION_JSON
@@ -249,7 +250,7 @@ class CarsApplicationTests @Autowired constructor(
             header { exists("Location") }
         }.andReturn()
 
-        assert(result3.response.getHeaderValue("Location").toStr().contains("http://localhost:8080/checkups/created/"))
+        assert(result3.response.getHeaderValue("Location").toStr().contains("http://localhost:8080/checkups/"))
 
         mvc.get("/cars/{id}", id).andExpect {
             status { is2xxSuccessful() }

@@ -1,8 +1,8 @@
 package com.infinum.academy.cars.controllers
 
 import com.infinum.academy.cars.domain.Car
+import com.infinum.academy.cars.dto.AddCarDto
 import com.infinum.academy.cars.dto.CarDetailsDto
-import com.infinum.academy.cars.dto.CarDto
 import com.infinum.academy.cars.services.CarService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -17,12 +17,13 @@ import java.net.URI
 class CarController(
     private val service: CarService
 ) {
+
     @GetMapping
     fun getAllCars(pageable: Pageable): ResponseEntity<Page<Car>> =
         ResponseEntity.ok(service.getAllCars(pageable))
 
     @PostMapping
-    fun addNewCar(@RequestBody carDto: CarDto): ResponseEntity<Unit> {
+    fun addNewCar(@RequestBody carDto: AddCarDto): ResponseEntity<Unit> {
         val id = service.addCar(carDto)
         return ResponseEntity.created(URI("http://localhost:8080/cars/$id")).build()
     }

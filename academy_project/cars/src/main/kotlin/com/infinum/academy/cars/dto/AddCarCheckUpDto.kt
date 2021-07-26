@@ -6,13 +6,13 @@ import com.infinum.academy.cars.repository.CarCheckUpRepository
 import com.infinum.academy.cars.repository.CarRepository
 import java.time.LocalDateTime
 
-data class CarCheckUpDto(
+data class AddCarCheckUpDto(
     val workerName: String,
     val price: Float,
     val carId: Long
 )
 
-fun CarCheckUpDto.toCarCheckUp(carFetcher:(Long)->Car) = CarCheckUp(
+fun AddCarCheckUpDto.toCarCheckUp(carFetcher:(Long)->Car) = CarCheckUp(
     datePerformed = LocalDateTime.now(),
     workerName = workerName,
     price = price,
