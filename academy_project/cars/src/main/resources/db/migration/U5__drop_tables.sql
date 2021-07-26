@@ -1,0 +1,2 @@
+DROP TABLE cars CASCADE;
+DROP TABLE checkups
