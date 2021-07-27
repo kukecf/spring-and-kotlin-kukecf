@@ -25,9 +25,10 @@ class CarCheckUpService(
         return checkUpRepo.save(checkUp).id
     }
 
-    fun getCarCheckUp(checkUpId: Long): CarCheckUp =
-        checkUpRepo.findById(checkUpId)
+    fun getCarCheckUp(checkUpId: Long): CheckUpDto =
+        CheckUpDto(checkUpRepo.findById(checkUpId)
             ?: throw CarCheckUpNotFoundException(checkUpId)
+        )
 
     fun getAllCheckUpsForCarId(id: Long, pageable: Pageable): Page<CheckUpDto> =
         checkUpRepo.findAllByCar(

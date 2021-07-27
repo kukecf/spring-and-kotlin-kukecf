@@ -23,7 +23,7 @@ import java.time.LocalDateTime
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class JPATests @Autowired constructor(
     val carRepo: CarRepository,
-    val checkupRepo: CarCheckUpRepository
+    val checkupRepo: CarCheckUpRepository,
 ) {
     private var car_example_id: Long = 0
 
@@ -131,7 +131,6 @@ class JPATests @Autowired constructor(
     fun `can find all checkups by car id`() {
         val checkups = checkupRepo.findAllCheckupsForDetails(car_example_id)
         assertThat(checkups.size).isEqualTo(3)
-        assertThat(checkups[1].worker_name).isEqualTo("Mirko")
     }
 
     @Test
@@ -142,5 +141,6 @@ class JPATests @Autowired constructor(
         assertThat(checkups.size).isEqualTo(2)
         assertThat(checkups.totalPages).isEqualTo(2)
     }
+
 
 }

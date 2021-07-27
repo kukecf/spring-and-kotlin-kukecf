@@ -207,7 +207,7 @@ class CarsApplicationTests @Autowired constructor(
 
 
     @Test
-    @DisplayName("should generate list of checkups for the same car")
+    @DisplayName("should generate list of checkups for car")
     @Transactional
     fun test6() {
         val car = AddCarDto(3, "Peugeot", "305", 2004, "89")
@@ -260,10 +260,66 @@ class CarsApplicationTests @Autowired constructor(
             jsonPath("$.modelName") { value("305") }
             jsonPath("$.productionYear") { value("2004") }
             jsonPath("$.serialNumber") { value("89") }
-            jsonPath("$.checkUps") {
+            jsonPath("$.checkups") {
                 isArray()
                 isNotEmpty()
             }
+        }
+    }
+
+    @Test
+    @DisplayName("should retrieve list of checkups from checkups endpoint for car")
+    @Transactional
+    fun test7() {
+        val car = AddCarDto(3, "Peugeot", "305", 2004, "89")
+
+
+        val result = mvc.post("/cars") {
+            contentType = MediaType.APPLICATION_JSON
+            content = mapper.writeValueAsString(car)
+            accept = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { is2xxSuccessful() }
+            header { exists("Location") }
+        }.andReturn()
+
+        val id = result.response.getHeaderValue("Location").toStr()
+            .removePrefix("http://localhost:8080/cars/")
+
+        val checkup1 = AddCarCheckUpDto("Josip", 2f, id.toLong())
+        val checkup2 = AddCarCheckUpDto("Stef", 2f, id.toLong())
+
+        val result2 = mvc.post("/checkups") {
+            contentType = MediaType.APPLICATION_JSON
+            content = mapper.writeValueAsString(checkup1)
+            accept = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { is2xxSuccessful() }
+            header { exists("Location") }
+        }.andReturn()
+
+        assert(result2.response.getHeaderValue("Location").toStr().contains("http://localhost:8080/checkups/"))
+
+        val result3 = mvc.post("/checkups") {
+            contentType = MediaType.APPLICATION_JSON
+            content = mapper.writeValueAsString(checkup2)
+            accept = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { is2xxSuccessful() }
+            header { exists("Location") }
+        }.andReturn()
+
+        assert(result3.response.getHeaderValue("Location").toStr().contains("http://localhost:8080/checkups/"))
+
+        mvc.get("/checkups/car/{id}", id).andExpect {
+            status { is2xxSuccessful() }
+            content { contentType(MediaType.APPLICATION_JSON) }
+            jsonPath("$.content") {
+                isArray()
+                isNotEmpty()
+            }
+            jsonPath("$.totalElements") {value(2)}
+            jsonPath("$.totalPages") { value(1)}
         }
     }
 
