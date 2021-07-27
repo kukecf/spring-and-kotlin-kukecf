@@ -4,6 +4,7 @@ import com.infinum.academy.cars.repository.CarCheckUpNotFoundException
 import com.infinum.academy.cars.repository.CarCheckUpRepository
 import com.infinum.academy.cars.domain.CarCheckUp
 import com.infinum.academy.cars.dto.AddCarCheckUpDto
+import com.infinum.academy.cars.dto.CheckUpDto
 import com.infinum.academy.cars.dto.toCarCheckUp
 import com.infinum.academy.cars.repository.CarNotFoundException
 import com.infinum.academy.cars.repository.CarRepository
@@ -28,10 +29,10 @@ class CarCheckUpService(
         checkUpRepo.findById(checkUpId)
             ?: throw CarCheckUpNotFoundException(checkUpId)
 
-    fun getAllCheckUpsForCarId(id: Long, pageable: Pageable): Page<CarCheckUp> =
+    fun getAllCheckUpsForCarId(id: Long, pageable: Pageable): Page<CheckUpDto> =
         checkUpRepo.findAllByCar(
             carRepo.findById(id) ?: throw CarNotFoundException(id),
             pageable
-        )
+        ).map{CheckUpDto(it)}
 
 }

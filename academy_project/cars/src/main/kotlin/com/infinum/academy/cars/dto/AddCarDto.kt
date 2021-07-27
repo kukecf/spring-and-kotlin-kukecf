@@ -12,10 +12,10 @@ data class AddCarDto(
 )
 
 fun AddCarDto.toCar() = Car(
-    ownerId = ownerId,
-    dateAdded = LocalDate.now(),
-    manufacturerName = manufacturerName,
-    modelName = modelName,
-    productionYear = productionYear,
-    serialNumber = serialNumber
+    owner_id = ownerId,
+    date_added = LocalDate.now(),
+    manufacturer_name = manufacturerName,
+    model_name = modelName,
+    production_year = productionYear,
+    serial_number = serialNumber
 )

@@ -18,8 +18,6 @@ interface CarRepository : Repository<Car, Long> {
     fun findAll(pageable: Pageable): Page<Car>
     fun findAll(): List<Car>
 
-    @Transactional
-    fun deleteById(id:Long): Long
     fun deleteAll()
 }
 

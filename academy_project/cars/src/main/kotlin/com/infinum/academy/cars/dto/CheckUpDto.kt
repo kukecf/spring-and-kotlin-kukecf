@@ -4,7 +4,7 @@ import com.infinum.academy.cars.domain.Car
 import com.infinum.academy.cars.domain.CarCheckUp
 import java.time.LocalDateTime
 
-data class CheckUpDetailsDto(
+data class CheckUpDto(
     val id: Long = 0,
 
     val datePerformed: LocalDateTime,
@@ -15,8 +15,8 @@ data class CheckUpDetailsDto(
 ){
     constructor(checkup:CarCheckUp) : this (
         checkup.id,
-        checkup.datePerformed,
-        checkup.workerName,
+        checkup.date_performed,
+        checkup.worker_name,
         checkup.price,
     )
 }

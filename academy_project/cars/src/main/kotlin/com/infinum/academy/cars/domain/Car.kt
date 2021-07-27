@@ -1,26 +1,25 @@
 package com.infinum.academy.cars.domain
 
-import org.springframework.data.repository.cdi.Eager
 import java.time.LocalDate
 import javax.persistence.*
 
 @Entity
-@Table(name = "cars", uniqueConstraints = [UniqueConstraint(columnNames = ["serialNumber"])])
+@Table(name = "cars", uniqueConstraints = [UniqueConstraint(columnNames = ["serial_number"])])
 data class Car(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CAR_SEQ")
     @SequenceGenerator(name = "CAR_SEQ", sequenceName = "CAR_SEQ", allocationSize = 1)
     val id: Long = 0,
 
-    val ownerId: Long,
+    val owner_id: Long,
 
-    val dateAdded: LocalDate,
+    val date_added: LocalDate,
 
-    val manufacturerName: String,
+    val manufacturer_name: String,
 
-    val modelName: String,
+    val model_name: String,
 
-    val productionYear: Int,
+    val production_year: Int,
 
-    val serialNumber: String
+    val serial_number: String
 )

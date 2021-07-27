@@ -16,7 +16,7 @@ interface CarCheckUpRepository : Repository<CarCheckUp, Long> {
     fun findById(id: Long): CarCheckUp?
     fun findAll(): List<CarCheckUp>
 
-    @Query("select check from CarCheckUp check join fetch Car car on car.id=check.car.id where check.car.id = :carId order by check.datePerformed desc")
+    @Query("select check from CarCheckUp check join fetch Car car on car.id=check.car.id where check.car.id = :carId order by check.date_performed desc")
     fun findAllCheckupsForDetails(carId: Long): List<CarCheckUp>
 
     fun findAllByCar(car: Car, pageable: Pageable): Page<CarCheckUp>

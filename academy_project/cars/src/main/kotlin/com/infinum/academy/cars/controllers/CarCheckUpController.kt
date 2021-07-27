@@ -1,7 +1,7 @@
 package com.infinum.academy.cars.controllers
 
-import com.infinum.academy.cars.domain.CarCheckUp
 import com.infinum.academy.cars.dto.AddCarCheckUpDto
+import com.infinum.academy.cars.dto.CheckUpDto
 import com.infinum.academy.cars.services.CarCheckUpService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
-import java.net.URI
 
 @Controller
 @RequestMapping("/checkups")
@@ -23,6 +22,7 @@ class CarCheckUpController(
         val location=ServletUriComponentsBuilder
             .fromCurrentRequest()
             .path("/{id}")
+            .port(8080)
             .buildAndExpand(id)
             .toUri()
         return ResponseEntity.created(location).build()
@@ -30,6 +30,6 @@ class CarCheckUpController(
 
     //mozda i ovdje vratiti checkUpDetailsDto?
     @GetMapping("/car/{carId}", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun allCheckUpsForCar(@PathVariable carId: Long, pageable:Pageable): ResponseEntity<Page<CarCheckUp>> =
+    fun allCheckUpsForCar(@PathVariable carId: Long, pageable:Pageable): ResponseEntity<Page<CheckUpDto>> =
         ResponseEntity.ok(service.getAllCheckUpsForCarId(carId,pageable))
 }
