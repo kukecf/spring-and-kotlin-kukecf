@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS carmodels(
-    manufacturer_name TEXT,
+    manufacturer TEXT,
     model_name TEXT,
     is_common BOOLEAN,
-    PRIMARY KEY (manufacturer_name,model_name)
+    PRIMARY KEY (manufacturer,model_name)
 );
 
 CREATE TABLE IF NOT EXISTS cars(
@@ -11,11 +11,11 @@ CREATE TABLE IF NOT EXISTS cars(
     date_added DATE,
     production_year INTEGER NOT NULL,
     serial_number TEXT UNIQUE NOT NULL,
-    manufacturer_name TEXT NOT NULL,
-    model_name TEXT NOT NULL,
+    info_manufacturer TEXT NOT NULL,
+    info_model_name TEXT NOT NULL,
     CONSTRAINT fk_info
-            FOREIGN KEY(manufacturer_name,model_name)
-                REFERENCES carmodels(manufacturer_name,model_name)
+            FOREIGN KEY(info_manufacturer,info_model_name)
+                REFERENCES carmodels(manufacturer,model_name)
 );
 
 CREATE TABLE IF NOT EXISTS checkups(
