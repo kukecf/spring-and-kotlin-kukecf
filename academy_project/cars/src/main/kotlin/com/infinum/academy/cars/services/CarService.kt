@@ -1,37 +1,37 @@
 package com.infinum.academy.cars.services
 
+import com.infinum.academy.cars.domain.Car
+import com.infinum.academy.cars.dto.AddCarDto
+import com.infinum.academy.cars.dto.CarDto
+import com.infinum.academy.cars.dto.toCar
 import com.infinum.academy.cars.repository.CarCheckUpRepository
 import com.infinum.academy.cars.repository.CarNotFoundException
 import com.infinum.academy.cars.repository.CarRepository
-import com.infinum.academy.cars.resource.*
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.http.HttpStatus
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
-import org.springframework.web.server.ResponseStatusException
 
 @Service
 class CarService(
     private val carRepo: CarRepository,
     private val checkUpRepo: CarCheckUpRepository
 ) {
-    fun addCar(carDto: CarDto): Long {
-        val car = carDto.toDomainModel()
-        return carRepo.save(car)
+    fun addCar(carDto: AddCarDto): Long {
+        val car = carDto.toCar()
+        return carRepo.save(car).id
     }
 
     private fun getCar(carId: Long): Car =
-        carRepo.findById(carId) ?: throw CarNotFoundException("Car with ID $carId does not exist!")
+        carRepo.findById(carId) ?: throw CarNotFoundException(carId)
 
-    fun getCarDetails(carId: Long): Car {
-        return getCar(carId).copy(checkUps=checkUpRepo.findAllByCarId(carId))
+
+    fun getCarDetails(carId: Long): CarDto =
+        CarDto(
+            getCar(carId),
+            checkUpRepo.findAllCheckupsForDetails(carId)
+        )
+
+    fun getAllCars(pageable: Pageable): Page<CarDto> {
+        return carRepo.findAll(pageable).map{CarDto(it)}
     }
-
-    fun getCarBySerial(serNo: String): Car =
-        carRepo.findBySerialNumber(serNo) ?: throw CarNotFoundException("Car with serial number $serNo does not exist!")
-
-    fun getAllCars(): List<Car> =
-        carRepo.findAll()
 }
-
-class CarConflictException(message: String) : ResponseStatusException(HttpStatus.CONFLICT, message)
-class CarCheckUpConflictException(message: String) : ResponseStatusException(HttpStatus.CONFLICT, message)

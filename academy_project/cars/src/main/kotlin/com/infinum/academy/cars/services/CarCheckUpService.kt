@@ -2,29 +2,38 @@ package com.infinum.academy.cars.services
 
 import com.infinum.academy.cars.repository.CarCheckUpNotFoundException
 import com.infinum.academy.cars.repository.CarCheckUpRepository
+import com.infinum.academy.cars.domain.CarCheckUp
+import com.infinum.academy.cars.dto.AddCarCheckUpDto
+import com.infinum.academy.cars.dto.CheckUpDto
+import com.infinum.academy.cars.dto.toCarCheckUp
+import com.infinum.academy.cars.repository.CarNotFoundException
 import com.infinum.academy.cars.repository.CarRepository
-import com.infinum.academy.cars.resource.CarCheckUp
-import com.infinum.academy.cars.resource.CarCheckUpDto
-import com.infinum.academy.cars.resource.toDomainModel
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 
 @Service
 class CarCheckUpService(
-    private val carRepo: CarRepository,
-    private val checkUpRepo: CarCheckUpRepository
+    private val checkUpRepo: CarCheckUpRepository,
+    private val carRepo: CarRepository
 ) {
-    fun addCarCheckUp(checkUpDto: CarCheckUpDto): Long {
-        val checkUp = checkUpDto.toDomainModel()
-        return checkUpRepo.save(checkUp)
+    fun addCarCheckUp(checkUpDto: AddCarCheckUpDto): Long {
+        val checkUp = checkUpDto.toCarCheckUp { carId ->
+            carRepo.findById(carId)
+                ?: throw CarNotFoundException(carId)
+        }
+        return checkUpRepo.save(checkUp).id
     }
 
-    fun getCarCheckUp(checkUpId: Long): CarCheckUp =
-        checkUpRepo.findById(checkUpId)
-            ?: throw CarCheckUpNotFoundException("Checkup with ID $checkUpId does not exist!")
+    fun getCarCheckUp(checkUpId: Long): CheckUpDto =
+        CheckUpDto(checkUpRepo.findById(checkUpId)
+            ?: throw CarCheckUpNotFoundException(checkUpId)
+        )
 
-    fun getAllCheckUps(): List<CarCheckUp> = checkUpRepo.findAll()
-
-    fun getAllCheckUpsForCarId(id: Long): List<CarCheckUp> =
-        checkUpRepo.findAllByCarId(id)
+    fun getAllCheckUpsForCarId(id: Long, pageable: Pageable): Page<CheckUpDto> =
+        checkUpRepo.findAllByCar(
+            carRepo.findById(id) ?: throw CarNotFoundException(id),
+            pageable
+        ).map{CheckUpDto(it)}
 
 }
