@@ -12,6 +12,7 @@ import com.infinum.academy.cars.exceptions.*
 import com.infinum.academy.cars.repository.CarCheckUpRepository
 import com.infinum.academy.cars.repository.CarInfoRepository
 import com.infinum.academy.cars.repository.CarRepository
+import com.infinum.academy.cars.services.CarInfoService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -41,7 +42,13 @@ class JPATests @Autowired constructor(
         }
         carRepo.deleteAll()
         checkupRepo.deleteAll()
+        carInfoRepository.deleteAll()
         val fetcher = { id: Long -> carRepo.findById(id) ?: throw CarNotFoundException(id) }
+        carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Peugeot","305"),true))
+        carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Dacia","Sandero"),true))
+        carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Opel","Corsa"),true))
+
+
         val peugeot = AddCarDto(4, 2004, "72", "Peugeot", "305").toCar(infoFetcher)
         val dacia = AddCarDto(1, 2010, "4", "Dacia", "Sandero").toCar(infoFetcher)
         val renault = AddCarDto(4, 2012, "8", "Opel", "Corsa").toCar(infoFetcher)
@@ -60,6 +67,9 @@ class JPATests @Autowired constructor(
                 AddCarCheckUpDto("Josip", 2f, dacia.id).toCarCheckUp(fetcher)
             )
         )
+
+        //carInfoService.saveModelsFromServer()
+
     }
 
     @Test
@@ -92,6 +102,7 @@ class JPATests @Autowired constructor(
 
     @Test
     fun `can add a checkup and find it`() {
+        carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Zastava","102"),true))
         val car = Car(
             owner_id = 2,
             date_added = LocalDate.now(),

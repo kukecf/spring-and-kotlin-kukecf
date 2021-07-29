@@ -12,4 +12,6 @@ interface CarInfoRepository : Repository<CarInfo, CarInfoPrimaryKey> {
 
     fun findByCarInfoPk(carInfoPrimaryKey: CarInfoPrimaryKey): CarInfo?
 
+    fun deleteAll()
+
 }

@@ -39,5 +39,9 @@ class CarInfoService(
                 infoRepository.save(it.toCarInfo())
             } ?: throw NoModelsException()
     }
+
+    fun deleteModels(){
+        infoRepository.deleteAll()
+    }
 }
 

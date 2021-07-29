@@ -38,6 +38,7 @@ class CarsApplicationTests @Autowired constructor(
 
     //@BeforeEach
     fun setUp(){
+        service.deleteModels()
         service.saveModelsFromServer()
     }
 
