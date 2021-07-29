@@ -19,17 +19,15 @@ class CarCheckUpController(
     @PostMapping
     fun addCarCheckUp(@RequestBody checkUpDto: AddCarCheckUpDto): ResponseEntity<Unit> {
         val id = service.addCarCheckUp(checkUpDto)
-        val location=ServletUriComponentsBuilder
+        val location = ServletUriComponentsBuilder
             .fromCurrentRequest()
             .path("/{id}")
-            .port(8080)
             .buildAndExpand(id)
             .toUri()
         return ResponseEntity.created(location).build()
     }
 
-    //mozda i ovdje vratiti checkUpDetailsDto?
     @GetMapping("/car/{carId}", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun allCheckUpsForCar(@PathVariable carId: Long, pageable:Pageable): ResponseEntity<Page<CheckUpDto>> =
-        ResponseEntity.ok(service.getAllCheckUpsForCarId(carId,pageable))
+    fun allCheckUpsForCar(@PathVariable carId: Long, pageable: Pageable): ResponseEntity<Page<CheckUpDto>> =
+        ResponseEntity.ok(service.getAllCheckUpsForCarId(carId, pageable))
 }
