@@ -3,7 +3,10 @@ package com.infinum.academy.cars
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.infinum.academy.cars.dto.AddCarCheckUpDto
 import com.infinum.academy.cars.dto.AddCarDto
+import com.infinum.academy.cars.services.CarInfoService
 import io.mockk.InternalPlatformDsl.toStr
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.mockserver.client.MockServerClient
@@ -26,14 +29,17 @@ import java.time.LocalDate
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@MockServerTest
 @Rollback
 class CarsApplicationTests @Autowired constructor(
     private val mvc: MockMvc,
-    private val mapper: ObjectMapper
+    private val mapper: ObjectMapper,
+    private val service: CarInfoService
 ) {
 
-    lateinit var mockServerClient: MockServerClient
+    //@BeforeEach
+    fun setUp(){
+        service.saveModelsFromServer()
+    }
 
     @Test
     @DisplayName("should return all cars")

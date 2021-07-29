@@ -1,6 +1,7 @@
 package com.infinum.academy.cars
 
 import org.junit.jupiter.api.Test
+import org.junit.runner.RunWith
 import org.mockserver.client.MockServerClient
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
@@ -11,12 +12,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.PropertySource
 import org.springframework.test.annotation.Rollback
+import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper
 
+@MockServerTest
 @SpringBootTest
-@AutoConfigureMockMvc
-@MockServerTest("car.data.model-info.base-url=http://localhost:${mockServerPort}")
+@PropertySource("classpath:mockserver.properties")
 class MockedServerTest @Autowired constructor(
     private val mvc: MockMvc,
     private val mapper: ObjectMapper
