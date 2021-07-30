@@ -1,22 +1,16 @@
 package com.infinum.academy.cars
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.infinum.academy.cars.config.IgnoreDuringTest
 import com.infinum.academy.cars.dto.AddCarCheckUpDto
 import com.infinum.academy.cars.dto.AddCarDto
 import com.infinum.academy.cars.services.CarInfoService
 import io.mockk.InternalPlatformDsl.toStr
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
-import org.mockserver.client.MockServerClient
-import org.mockserver.model.HttpRequest
-import org.mockserver.model.HttpRequest.request
-import org.mockserver.model.HttpResponse
-import org.mockserver.springtest.MockServerTest
+import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.ComponentScan
 import org.springframework.http.MediaType
 import org.springframework.test.annotation.Rollback
 import org.springframework.test.web.servlet.MockMvc
@@ -30,16 +24,23 @@ import java.time.LocalDate
 @SpringBootTest
 @AutoConfigureMockMvc
 @Rollback
+@ComponentScan(excludeFilters = [ComponentScan.Filter(IgnoreDuringTest::class)])
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CarsApplicationTests @Autowired constructor(
     private val mvc: MockMvc,
     private val mapper: ObjectMapper,
     private val service: CarInfoService
 ) {
 
-    //@BeforeEach
-    fun setUp(){
+    @BeforeAll
+    fun setUp() {
         service.deleteModels()
         service.saveModelsFromServer()
+    }
+
+    @AfterAll
+    fun shutDown() {
+        service.deleteModels()
     }
 
     @Test
@@ -47,7 +48,7 @@ class CarsApplicationTests @Autowired constructor(
     @Transactional
     fun test1() {
         val car = AddCarDto(1, 2004, "89", "Berkeley", "QB")
-        val car2 = AddCarDto(4, 2010, "98", "Gaz", "61")
+        val car2 = AddCarDto(4, 2010, "98", "Lamborghini", "Aventador")
         val result1 = mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car)
@@ -118,8 +119,8 @@ class CarsApplicationTests @Autowired constructor(
             jsonPath("$.id") { value(id) }
             jsonPath("$.ownerId") { value("1") }
             jsonPath("$.dateAdded") { value(LocalDate.now().toStr()) }
-            jsonPath("$.manufacturerName") { value("Peugeot") }
-            jsonPath("$.modelName") { value("305") }
+            jsonPath("$.manufacturerName") { value("Maserati") }
+            jsonPath("$.modelName") { value("150S") }
             jsonPath("$.productionYear") { value("2004") }
             jsonPath("$.serialNumber") { value("89") }
             content { contentType(MediaType.APPLICATION_JSON) }
@@ -162,8 +163,8 @@ class CarsApplicationTests @Autowired constructor(
             jsonPath("$.id") { value(id1) }
             jsonPath("$.ownerId") { value("1") }
             jsonPath("$.dateAdded")
-            jsonPath("$.manufacturerName") { value("Peugeot") }
-            jsonPath("$.modelName") { value("305") }
+            jsonPath("$.manufacturerName") { value("Marcos") }
+            jsonPath("$.modelName") { value("Ugly Duckling") }
             jsonPath("$.productionYear") { value("2004") }
             jsonPath("$.serialNumber") { value("889") }
             content { contentType(MediaType.APPLICATION_JSON) }
@@ -174,8 +175,8 @@ class CarsApplicationTests @Autowired constructor(
             jsonPath("$.id") { value(id2) }
             jsonPath("$.ownerId") { value("2") }
             jsonPath("$.dateAdded")
-            jsonPath("$.manufacturerName") { value("Fiat") }
-            jsonPath("$.modelName") { value("Punto") }
+            jsonPath("$.manufacturerName") { value("Maserati") }
+            jsonPath("$.modelName") { value("Tipo 65") }
             jsonPath("$.productionYear") { value("2007") }
             jsonPath("$.serialNumber") { value("988") }
             jsonPath("$.checkUps")
@@ -269,8 +270,8 @@ class CarsApplicationTests @Autowired constructor(
             jsonPath("$.id") { value(id) }
             jsonPath("$.ownerId") { value("3") }
             jsonPath("$.dateAdded") { value(LocalDate.now().toStr()) }
-            jsonPath("$.manufacturerName") { value("Peugeot") }
-            jsonPath("$.modelName") { value("305") }
+            jsonPath("$.manufacturerName") { value("Mazda") }
+            jsonPath("$.modelName") { value("CX-7") }
             jsonPath("$.productionYear") { value("2004") }
             jsonPath("$.serialNumber") { value("89") }
             jsonPath("$.checkups") {
@@ -335,7 +336,6 @@ class CarsApplicationTests @Autowired constructor(
             jsonPath("$.totalPages") { value(1) }
         }
     }
-
 
 
 }

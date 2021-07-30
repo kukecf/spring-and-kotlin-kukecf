@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled
 
 @Configuration
 @EnableScheduling
+@IgnoreDuringTest
 class SchedulingConfig(
     private val service: CarInfoService
 ) {
