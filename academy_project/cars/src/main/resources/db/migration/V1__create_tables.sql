@@ -1,11 +1,21 @@
+CREATE TABLE IF NOT EXISTS carmodels(
+    manufacturer TEXT,
+    model_name TEXT,
+    is_common BOOLEAN,
+    PRIMARY KEY (manufacturer,model_name)
+);
+
 CREATE TABLE IF NOT EXISTS cars(
     id BIGSERIAL PRIMARY KEY,
     owner_id BIGINT NOT NULL,
     date_added DATE,
-    manufacturer_name TEXT NOT NULL,
-    model_name TEXT NOT NULL,
     production_year INTEGER NOT NULL,
-    serial_number TEXT UNIQUE NOT NULL
+    serial_number TEXT UNIQUE NOT NULL,
+    info_manufacturer TEXT NOT NULL,
+    info_model_name TEXT NOT NULL,
+    CONSTRAINT fk_info
+            FOREIGN KEY(info_manufacturer,info_model_name)
+                REFERENCES carmodels(manufacturer,model_name)
 );
 
 CREATE TABLE IF NOT EXISTS checkups(
@@ -22,3 +32,4 @@ CREATE TABLE IF NOT EXISTS checkups(
 CREATE SEQUENCE IF NOT EXISTS CAR_SEQ;
 
 CREATE SEQUENCE IF NOT EXISTS CHECKUP_SEQ;
+

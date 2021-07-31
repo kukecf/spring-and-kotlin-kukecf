@@ -15,11 +15,10 @@ data class Car(
 
     val date_added: LocalDate,
 
-    val manufacturer_name: String,
-
-    val model_name: String,
-
     val production_year: Int,
 
-    val serial_number: String
+    val serial_number: String,
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    val info: CarInfo
 )

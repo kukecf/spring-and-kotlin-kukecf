@@ -2,12 +2,15 @@ package com.infinum.academy.cars
 
 import com.infinum.academy.cars.domain.Car
 import com.infinum.academy.cars.domain.CarCheckUp
+import com.infinum.academy.cars.domain.CarInfo
+import com.infinum.academy.cars.domain.CarInfoPrimaryKey
 import com.infinum.academy.cars.dto.AddCarCheckUpDto
 import com.infinum.academy.cars.dto.AddCarDto
 import com.infinum.academy.cars.dto.toCar
 import com.infinum.academy.cars.dto.toCarCheckUp
+import com.infinum.academy.cars.exceptions.*
 import com.infinum.academy.cars.repository.CarCheckUpRepository
-import com.infinum.academy.cars.repository.CarNotFoundException
+import com.infinum.academy.cars.repository.CarInfoRepository
 import com.infinum.academy.cars.repository.CarRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -16,26 +19,40 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.data.domain.PageRequest
+import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles(profiles=["test"])
 class JPATests @Autowired constructor(
     val carRepo: CarRepository,
     val checkupRepo: CarCheckUpRepository,
+    val carInfoRepository: CarInfoRepository
 ) {
     private var car_example_id: Long = 0
 
     @BeforeEach
     fun setUp() {
-
+        val infoFetcher: (String, String) -> CarInfo = { man, model ->
+            carInfoRepository.findByCarInfoPk(CarInfoPrimaryKey(man, model)) ?: throw CarInfoNotFoundException(
+                man,
+                model
+            )
+        }
         carRepo.deleteAll()
         checkupRepo.deleteAll()
+        carInfoRepository.deleteAll()
         val fetcher = { id: Long -> carRepo.findById(id) ?: throw CarNotFoundException(id) }
-        val peugeot = AddCarDto(4, "Peugeot", "305", 2004, "72").toCar()
-        val dacia = AddCarDto(1, "Dacia", "Sandero", 2010, "4").toCar()
-        val renault = AddCarDto(4, "Opel", "Corsa", 2012, "8").toCar()
+        carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Peugeot","305"),true))
+        carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Dacia","Sandero"),true))
+        carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Opel","Corsa"),true))
+
+
+        val peugeot = AddCarDto(4, 2004, "72", "Peugeot", "305").toCar(infoFetcher)
+        val dacia = AddCarDto(1, 2010, "4", "Dacia", "Sandero").toCar(infoFetcher)
+        val renault = AddCarDto(4, 2012, "8", "Opel", "Corsa").toCar(infoFetcher)
 
 
         val cars = listOf(dacia, renault)
@@ -51,6 +68,9 @@ class JPATests @Autowired constructor(
                 AddCarCheckUpDto("Josip", 2f, dacia.id).toCarCheckUp(fetcher)
             )
         )
+
+        //carInfoService.saveModelsFromServer()
+
     }
 
     @Test
@@ -72,8 +92,8 @@ class JPATests @Autowired constructor(
         val car = Car(
             owner_id = 2,
             date_added = LocalDate.now(),
-            manufacturer_name = "Zastava",
-            model_name = "101",
+            info = carInfoRepository.findByCarInfoPk(CarInfoPrimaryKey("Peugeot", "305"))
+                ?: throw CarInfoNotFoundException("Peugeot", "305"),
             production_year = 1989,
             serial_number = "800"
         )
@@ -83,11 +103,12 @@ class JPATests @Autowired constructor(
 
     @Test
     fun `can add a checkup and find it`() {
+        carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Zastava","102"),true))
         val car = Car(
             owner_id = 2,
             date_added = LocalDate.now(),
-            manufacturer_name = "Zastava",
-            model_name = "101",
+            info = carInfoRepository.findByCarInfoPk(CarInfoPrimaryKey("Zastava", "102"))
+                ?: throw CarInfoNotFoundException("Zastava", "102"),
             production_year = 1989,
             serial_number = "800"
         )

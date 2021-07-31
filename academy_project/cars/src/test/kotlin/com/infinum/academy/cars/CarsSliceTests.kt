@@ -1,28 +1,26 @@
 package com.infinum.academy.cars
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.infinum.academy.cars.domain.CarCheckUp
-import com.infinum.academy.cars.dto.AddCarCheckUpDto
 import com.infinum.academy.cars.dto.AddCarDto
 import com.infinum.academy.cars.dto.CheckUpDto
 import com.infinum.academy.cars.dto.toCar
-import com.infinum.academy.cars.repository.CarCheckUpNotFoundException
-import com.infinum.academy.cars.repository.CarNotFoundException
+import com.infinum.academy.cars.exceptions.CarCheckUpNotFoundException
+import com.infinum.academy.cars.exceptions.CarNotFoundException
 import com.infinum.academy.cars.services.CarCheckUpService
 import com.infinum.academy.cars.services.CarService
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import java.time.LocalDateTime
 
 @WebMvcTest
 @AutoConfigureMockMvc
+@ActiveProfiles(profiles=["test"])
 class CarsSliceTests @Autowired constructor(
     private val mvc: MockMvc,
     private val mapper: ObjectMapper
@@ -31,16 +29,16 @@ class CarsSliceTests @Autowired constructor(
     lateinit var carService: CarService
 
     @MockkBean
-    lateinit var checkupService : CarCheckUpService
-
+    lateinit var checkupService: CarCheckUpService
+/*
     @BeforeEach
     fun setUp() {
-        val car=AddCarDto(
+        val car = AddCarDto(
             1,
+            2002,
+            "2",
             "Peugeot",
             "305",
-            2002,
-            "2"
         ).toCar()
         every {
             checkupService.getCarCheckUp(1)
@@ -67,7 +65,7 @@ class CarsSliceTests @Autowired constructor(
             checkupService.addCarCheckUp(any())
         } returns 1
     }
-/*
+
     @Test
     fun `should fail to find nonexisting car`() {
         Assertions.assertThatThrownBy {

@@ -1,6 +1,5 @@
 package com.infinum.academy.cars.controllers
 
-import com.infinum.academy.cars.domain.Car
 import com.infinum.academy.cars.dto.AddCarDto
 import com.infinum.academy.cars.dto.CarDto
 import com.infinum.academy.cars.services.CarService
@@ -25,10 +24,9 @@ class CarController(
     @PostMapping
     fun addNewCar(@RequestBody carDto: AddCarDto): ResponseEntity<Unit> {
         val id = service.addCar(carDto)
-        val location= ServletUriComponentsBuilder
+        val location = ServletUriComponentsBuilder
             .fromCurrentRequest()
             .path("/{id}")
-            .port(8080)
             .buildAndExpand(id)
             .toUri()
         return ResponseEntity.created(location).build()

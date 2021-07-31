@@ -22,17 +22,17 @@ data class CarDto(
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     val checkups: List<CheckUpDto> = emptyList()
-){
-    constructor(car: Car, checkups: List<CarCheckUp>) : this (
-    car.id,
-    car.owner_id,
-    car.date_added,
-    car.manufacturer_name,
-    car.model_name,
-    car.production_year,
-    car.serial_number,
-    checkups.map{CheckUpDto(it)}
+) {
+    constructor(car: Car, checkups: List<CarCheckUp>) : this(
+        car.id,
+        car.owner_id,
+        car.date_added,
+        car.info.carInfoPk.manufacturer,
+        car.info.carInfoPk.modelName,
+        car.production_year,
+        car.serial_number,
+        checkups.map { CheckUpDto(it) }
     )
 
-    constructor(car:Car) : this(car,emptyList())
+    constructor(car: Car) : this(car, emptyList())
 }

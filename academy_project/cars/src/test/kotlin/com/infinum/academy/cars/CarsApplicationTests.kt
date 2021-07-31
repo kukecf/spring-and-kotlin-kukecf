@@ -1,22 +1,23 @@
 package com.infinum.academy.cars
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.infinum.academy.cars.config.IgnoreDuringTest
 import com.infinum.academy.cars.dto.AddCarCheckUpDto
 import com.infinum.academy.cars.dto.AddCarDto
-import com.infinum.academy.cars.dto.toCar
-import com.infinum.academy.cars.dto.toCarCheckUp
+import com.infinum.academy.cars.services.CarInfoAdministrationService
 import io.mockk.InternalPlatformDsl.toStr
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.ComponentScan
 import org.springframework.http.MediaType
 import org.springframework.test.annotation.Rollback
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
@@ -24,17 +25,31 @@ import java.time.LocalDate
 @SpringBootTest
 @AutoConfigureMockMvc
 @Rollback
+@ActiveProfiles(profiles=["test"])
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CarsApplicationTests @Autowired constructor(
     private val mvc: MockMvc,
-    private val mapper: ObjectMapper
+    private val mapper: ObjectMapper,
+    private val service: CarInfoAdministrationService
 ) {
+
+    @BeforeAll
+    fun setUp() {
+        service.deleteModels()
+        service.saveModelsFromServer()
+    }
+
+    @AfterAll
+    fun shutDown() {
+        service.deleteModels()
+    }
 
     @Test
     @DisplayName("should return all cars")
     @Transactional
     fun test1() {
-        val car = AddCarDto(1, "Peugeot", "305", 2004, "89")
-        val car2 = AddCarDto(4, "Dacia", "Sandero", 2010, "98")
+        val car = AddCarDto(1, 2004, "89", "Berkeley", "QB")
+        val car2 = AddCarDto(4, 2010, "98", "Lamborghini", "Aventador")
         val result1 = mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car)
@@ -45,7 +60,7 @@ class CarsApplicationTests @Autowired constructor(
         }.andReturn()
 
         val id1 = result1.response.getHeaderValue("Location").toStr()
-            .removePrefix("http://localhost:8080/cars/")
+            .removePrefix("http://localhost/cars/")
 
         val result2 = mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
@@ -57,11 +72,11 @@ class CarsApplicationTests @Autowired constructor(
         }.andReturn()
 
         val id2 = result2.response.getHeaderValue("Location").toStr()
-            .removePrefix("http://localhost:8080/cars/")
+            .removePrefix("http://localhost/cars/")
 
-        mvc.get("/cars").andExpect{
+        mvc.get("/cars").andExpect {
             status { is2xxSuccessful() }
-            jsonPath("content"){isNotEmpty()}
+            jsonPath("content") { isNotEmpty() }
         }
     }
 
@@ -69,7 +84,7 @@ class CarsApplicationTests @Autowired constructor(
     @DisplayName("should add car and check its addition")
     @Transactional
     fun test2() {
-        val car = AddCarDto(1, "Peugeot", "305", 2004, "89")
+        val car = AddCarDto(1, 2004, "89", "Ferrari", "125")
 
         mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
@@ -87,7 +102,7 @@ class CarsApplicationTests @Autowired constructor(
     @DisplayName("should add car and check its details")
     @Transactional
     fun test3() {
-        val car = AddCarDto(1, "Peugeot", "305", 2004, "89")
+        val car = AddCarDto(1, 2004, "89", "Maserati", "150S")
 
         val result = mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
@@ -99,14 +114,14 @@ class CarsApplicationTests @Autowired constructor(
         }.andReturn()
 
         val id = result.response.getHeaderValue("Location").toStr()
-            .removePrefix("http://localhost:8080/cars/")
+            .removePrefix("http://localhost/cars/")
 
         mvc.get("/cars/{id}", id).andExpect {
             jsonPath("$.id") { value(id) }
             jsonPath("$.ownerId") { value("1") }
             jsonPath("$.dateAdded") { value(LocalDate.now().toStr()) }
-            jsonPath("$.manufacturerName") { value("Peugeot") }
-            jsonPath("$.modelName") { value("305") }
+            jsonPath("$.manufacturerName") { value("Maserati") }
+            jsonPath("$.modelName") { value("150S") }
             jsonPath("$.productionYear") { value("2004") }
             jsonPath("$.serialNumber") { value("89") }
             content { contentType(MediaType.APPLICATION_JSON) }
@@ -118,8 +133,8 @@ class CarsApplicationTests @Autowired constructor(
     @DisplayName("should add second car and not alter details of first")
     @Transactional
     fun test4() {
-        val car1 = AddCarDto(1, "Peugeot", "305", 2004, "889")
-        val car2 = AddCarDto(2, "Fiat", "Punto", 2007, "988")
+        val car1 = AddCarDto(1, 2004, "889", "Marcos", "Ugly Duckling")
+        val car2 = AddCarDto(2, 2007, "988", "Maserati", "Tipo 65")
 
         val result1 = mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
@@ -131,7 +146,7 @@ class CarsApplicationTests @Autowired constructor(
         }.andReturn()
 
         val id1 = result1.response.getHeaderValue("Location").toStr()
-            .removePrefix("http://localhost:8080/cars/")
+            .removePrefix("http://localhost/cars/")
 
         val result2 = mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
@@ -143,14 +158,14 @@ class CarsApplicationTests @Autowired constructor(
         }.andReturn()
 
         val id2 = result2.response.getHeaderValue("Location").toStr()
-            .removePrefix("http://localhost:8080/cars/")
+            .removePrefix("http://localhost/cars/")
 
         mvc.get("/cars/{id}", id1).andExpect {
             jsonPath("$.id") { value(id1) }
             jsonPath("$.ownerId") { value("1") }
             jsonPath("$.dateAdded")
-            jsonPath("$.manufacturerName") { value("Peugeot") }
-            jsonPath("$.modelName") { value("305") }
+            jsonPath("$.manufacturerName") { value("Marcos") }
+            jsonPath("$.modelName") { value("Ugly Duckling") }
             jsonPath("$.productionYear") { value("2004") }
             jsonPath("$.serialNumber") { value("889") }
             content { contentType(MediaType.APPLICATION_JSON) }
@@ -161,8 +176,8 @@ class CarsApplicationTests @Autowired constructor(
             jsonPath("$.id") { value(id2) }
             jsonPath("$.ownerId") { value("2") }
             jsonPath("$.dateAdded")
-            jsonPath("$.manufacturerName") { value("Fiat") }
-            jsonPath("$.modelName") { value("Punto") }
+            jsonPath("$.manufacturerName") { value("Maserati") }
+            jsonPath("$.modelName") { value("Tipo 65") }
             jsonPath("$.productionYear") { value("2007") }
             jsonPath("$.serialNumber") { value("988") }
             jsonPath("$.checkUps")
@@ -175,10 +190,10 @@ class CarsApplicationTests @Autowired constructor(
     @DisplayName("should add car and checkup for it")
     @Transactional
     fun test5() {
-        val car = AddCarDto(3, "Peugeot", "305", 2004, "89")
+        val car = AddCarDto(3, 2004, "89", "Mazda", "Activehicle")
 
 
-        val result=mvc.post("/cars") {
+        val result = mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car)
             accept = MediaType.APPLICATION_JSON
@@ -189,7 +204,7 @@ class CarsApplicationTests @Autowired constructor(
             }
         }.andReturn()
         val id = result.response.getHeaderValue("Location").toStr()
-            .removePrefix("http://localhost:8080/cars/")
+            .removePrefix("http://localhost/cars/")
 
         val checkup = AddCarCheckUpDto("Josip", 2f, id.toLong())
 
@@ -210,7 +225,7 @@ class CarsApplicationTests @Autowired constructor(
     @DisplayName("should generate list of checkups for car")
     @Transactional
     fun test6() {
-        val car = AddCarDto(3, "Peugeot", "305", 2004, "89")
+        val car = AddCarDto(3, 2004, "89", "Mazda", "CX-7")
 
 
         val result = mvc.post("/cars") {
@@ -223,7 +238,7 @@ class CarsApplicationTests @Autowired constructor(
         }.andReturn()
 
         val id = result.response.getHeaderValue("Location").toStr()
-            .removePrefix("http://localhost:8080/cars/")
+            .removePrefix("http://localhost/cars/")
 
         val checkup1 = AddCarCheckUpDto("Josip", 2f, id.toLong())
         val checkup2 = AddCarCheckUpDto("Stef", 2f, id.toLong())
@@ -237,7 +252,7 @@ class CarsApplicationTests @Autowired constructor(
             header { exists("Location") }
         }.andReturn()
 
-        assert(result2.response.getHeaderValue("Location").toStr().contains("http://localhost:8080/checkups/"))
+        assert(result2.response.getHeaderValue("Location").toStr().contains("http://localhost/checkups/"))
 
         val result3 = mvc.post("/checkups") {
             contentType = MediaType.APPLICATION_JSON
@@ -248,7 +263,7 @@ class CarsApplicationTests @Autowired constructor(
             header { exists("Location") }
         }.andReturn()
 
-        assert(result3.response.getHeaderValue("Location").toStr().contains("http://localhost:8080/checkups/"))
+        assert(result3.response.getHeaderValue("Location").toStr().contains("http://localhost/checkups/"))
 
         mvc.get("/cars/{id}", id).andExpect {
             status { is2xxSuccessful() }
@@ -256,8 +271,8 @@ class CarsApplicationTests @Autowired constructor(
             jsonPath("$.id") { value(id) }
             jsonPath("$.ownerId") { value("3") }
             jsonPath("$.dateAdded") { value(LocalDate.now().toStr()) }
-            jsonPath("$.manufacturerName") { value("Peugeot") }
-            jsonPath("$.modelName") { value("305") }
+            jsonPath("$.manufacturerName") { value("Mazda") }
+            jsonPath("$.modelName") { value("CX-7") }
             jsonPath("$.productionYear") { value("2004") }
             jsonPath("$.serialNumber") { value("89") }
             jsonPath("$.checkups") {
@@ -271,7 +286,7 @@ class CarsApplicationTests @Autowired constructor(
     @DisplayName("should retrieve list of checkups from checkups endpoint for car")
     @Transactional
     fun test7() {
-        val car = AddCarDto(3, "Peugeot", "305", 2004, "89")
+        val car = AddCarDto(3, 2004, "89", "Peugeot", "306")
 
 
         val result = mvc.post("/cars") {
@@ -284,7 +299,7 @@ class CarsApplicationTests @Autowired constructor(
         }.andReturn()
 
         val id = result.response.getHeaderValue("Location").toStr()
-            .removePrefix("http://localhost:8080/cars/")
+            .removePrefix("http://localhost/cars/")
 
         val checkup1 = AddCarCheckUpDto("Josip", 2f, id.toLong())
         val checkup2 = AddCarCheckUpDto("Stef", 2f, id.toLong())
@@ -298,7 +313,7 @@ class CarsApplicationTests @Autowired constructor(
             header { exists("Location") }
         }.andReturn()
 
-        assert(result2.response.getHeaderValue("Location").toStr().contains("http://localhost:8080/checkups/"))
+        assert(result2.response.getHeaderValue("Location").toStr().contains("http://localhost/checkups/"))
 
         val result3 = mvc.post("/checkups") {
             contentType = MediaType.APPLICATION_JSON
@@ -309,7 +324,7 @@ class CarsApplicationTests @Autowired constructor(
             header { exists("Location") }
         }.andReturn()
 
-        assert(result3.response.getHeaderValue("Location").toStr().contains("http://localhost:8080/checkups/"))
+        assert(result3.response.getHeaderValue("Location").toStr().contains("http://localhost/checkups/"))
 
         mvc.get("/checkups/car/{id}", id).andExpect {
             status { is2xxSuccessful() }
@@ -318,11 +333,10 @@ class CarsApplicationTests @Autowired constructor(
                 isArray()
                 isNotEmpty()
             }
-            jsonPath("$.totalElements") {value(2)}
-            jsonPath("$.totalPages") { value(1)}
+            jsonPath("$.totalElements") { value(2) }
+            jsonPath("$.totalPages") { value(1) }
         }
     }
-
 
 
 }

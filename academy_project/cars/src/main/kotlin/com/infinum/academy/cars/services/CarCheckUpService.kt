@@ -1,12 +1,11 @@
 package com.infinum.academy.cars.services
 
-import com.infinum.academy.cars.repository.CarCheckUpNotFoundException
-import com.infinum.academy.cars.repository.CarCheckUpRepository
-import com.infinum.academy.cars.domain.CarCheckUp
 import com.infinum.academy.cars.dto.AddCarCheckUpDto
 import com.infinum.academy.cars.dto.CheckUpDto
 import com.infinum.academy.cars.dto.toCarCheckUp
-import com.infinum.academy.cars.repository.CarNotFoundException
+import com.infinum.academy.cars.exceptions.CarCheckUpNotFoundException
+import com.infinum.academy.cars.exceptions.CarNotFoundException
+import com.infinum.academy.cars.repository.CarCheckUpRepository
 import com.infinum.academy.cars.repository.CarRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -26,14 +25,15 @@ class CarCheckUpService(
     }
 
     fun getCarCheckUp(checkUpId: Long): CheckUpDto =
-        CheckUpDto(checkUpRepo.findById(checkUpId)
-            ?: throw CarCheckUpNotFoundException(checkUpId)
+        CheckUpDto(
+            checkUpRepo.findById(checkUpId)
+                ?: throw CarCheckUpNotFoundException(checkUpId)
         )
 
     fun getAllCheckUpsForCarId(id: Long, pageable: Pageable): Page<CheckUpDto> =
         checkUpRepo.findAllByCar(
             carRepo.findById(id) ?: throw CarNotFoundException(id),
             pageable
-        ).map{CheckUpDto(it)}
+        ).map { CheckUpDto(it) }
 
 }
