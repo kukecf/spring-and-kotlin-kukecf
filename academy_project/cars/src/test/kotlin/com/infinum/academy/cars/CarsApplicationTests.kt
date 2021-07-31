@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.infinum.academy.cars.config.IgnoreDuringTest
 import com.infinum.academy.cars.dto.AddCarCheckUpDto
 import com.infinum.academy.cars.dto.AddCarDto
-import com.infinum.academy.cars.services.CarInfoService
+import com.infinum.academy.cars.services.CarInfoAdministrationService
 import io.mockk.InternalPlatformDsl.toStr
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.http.MediaType
 import org.springframework.test.annotation.Rollback
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
@@ -24,12 +25,12 @@ import java.time.LocalDate
 @SpringBootTest
 @AutoConfigureMockMvc
 @Rollback
-@ComponentScan(excludeFilters = [ComponentScan.Filter(IgnoreDuringTest::class)])
+@ActiveProfiles(profiles=["test"])
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CarsApplicationTests @Autowired constructor(
     private val mvc: MockMvc,
     private val mapper: ObjectMapper,
-    private val service: CarInfoService
+    private val service: CarInfoAdministrationService
 ) {
 
     @BeforeAll

@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.PropertySource
 import org.springframework.test.annotation.Rollback
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
@@ -24,6 +25,7 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper
 @SpringBootTest
 @MockServerTest
 @PropertySource("classpath:mockserver.properties")
+@ActiveProfiles(profiles=["test"])
 class MockedServerTest @Autowired constructor(
     private val mvc: MockMvc,
     private val mapper: ObjectMapper
@@ -45,28 +47,28 @@ class MockedServerTest @Autowired constructor(
                         """
                         {
                             "data": [
-                                {"manufacturer":"Abarth","model_name":"1000","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"1000 Bialbero ","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"1000 GT","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"1000 TC Corsa","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"103 GT","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"124","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"1300","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"1500","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"1600","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"2000","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"205","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"207","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"208","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"209","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"210","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"2200","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"2400","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"500","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"595","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"600","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"700","is_common":0},
-                                {"manufacturer":"Abarth","model_name":"750","is_common":0}    
+                                {"manufacturer":"Abarth","modelName":"1000","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"1000 Bialbero ","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"1000 GT","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"1000 TC Corsa","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"103 GT","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"124","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"1300","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"1500","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"1600","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"2000","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"205","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"207","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"208","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"209","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"210","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"2200","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"2400","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"500","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"595","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"600","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"700","isCommon":0},
+                                {"manufacturer":"Abarth","modelName":"750","isCommon":0}    
                             ]
                         }
                     """.trimIndent()

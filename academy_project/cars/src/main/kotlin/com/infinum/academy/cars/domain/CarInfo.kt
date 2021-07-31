@@ -10,7 +10,7 @@ data class CarInfo(
     @EmbeddedId
     val carInfoPk: CarInfoPrimaryKey,
 
-    @Column(name = "is_common")
+    @Column(name = "isCommon")
     val isCommon: Boolean
 
 )
@@ -18,6 +18,6 @@ data class CarInfo(
 @Embeddable
 data class CarInfoPrimaryKey(
     val manufacturer: String,
-    @Column(name = "model_name")
+    @Column(name = "modelName")
     val modelName: String
 ) : Serializable
