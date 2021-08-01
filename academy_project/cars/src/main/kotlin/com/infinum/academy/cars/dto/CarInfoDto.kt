@@ -9,8 +9,8 @@ import org.springframework.hateoas.server.core.Relation
 
 data class CarInfoDto(
     @JsonProperty("manufacturer") val manName: String,
-    @JsonProperty("modelName") val modelName: String,
-    @JsonProperty("isCommon") val isCommon: Boolean,
+    @JsonProperty("model_name") val modelName: String,
+    @JsonProperty("is_common") val isCommon: Boolean,
 )
 
 data class CarResponse(

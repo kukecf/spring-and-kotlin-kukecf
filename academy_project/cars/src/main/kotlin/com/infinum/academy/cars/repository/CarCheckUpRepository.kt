@@ -22,7 +22,8 @@ interface CarCheckUpRepository : Repository<CarCheckUp, Long> {
 
     fun findAllByOrderByDatePerformedDesc(): List<CarCheckUp>
 
-    @Query("select * from checkups order by date_performed desc fetch first :lim rows only", nativeQuery = true)
+    //skuzio sam da u ovaj query trebaju ici svi checkupovi koji su vec napravljeni
+    @Query("select * from checkups cu where date_performed <= current_timestamp order by date_performed desc fetch first :lim rows only", nativeQuery = true)
     fun findLatestCheckups(@Param("lim") limit: Int): List<CarCheckUp>
 
     @Query("select check from CarCheckUp check join fetch Car car on car.id=check.car.id where check.car.id = :carId order by check.datePerformed desc")
