@@ -114,8 +114,8 @@ class JPATests @Autowired constructor(
         )
         val id = carRepo.save(car).id
         val checkup = CarCheckUp(
-            date_performed = LocalDateTime.now(),
-            worker_name = "Mario",
+            datePerformed = LocalDateTime.now(),
+            workerName = "Mario",
             price = 20f,
             car = car
         )
@@ -135,7 +135,7 @@ class JPATests @Autowired constructor(
         val pageable = PageRequest.of(0, 2)
         val checkups = checkupRepo.findAllByCar(car, pageable)
         assertThat(checkups.size).isEqualTo(2)
-        assertThat(checkups.content[0].worker_name).isEqualTo("Josip")
+        assertThat(checkups.content[0].workerName).isEqualTo("Josip")
     }
 
     @Test

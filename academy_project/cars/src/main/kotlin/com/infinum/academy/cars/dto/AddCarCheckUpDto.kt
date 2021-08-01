@@ -11,8 +11,8 @@ data class AddCarCheckUpDto(
 )
 
 fun AddCarCheckUpDto.toCarCheckUp(carFetcher: (Long) -> Car) = CarCheckUp(
-    date_performed = LocalDateTime.now(),
-    worker_name = workerName,
+    datePerformed = LocalDateTime.now(),
+    workerName = workerName,
     price = price,
     car = carFetcher.invoke(this.carId)
 )

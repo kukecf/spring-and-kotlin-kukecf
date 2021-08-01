@@ -1,7 +1,6 @@
 package com.infinum.academy.cars
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.infinum.academy.cars.config.IgnoreDuringTest
 import com.infinum.academy.cars.dto.AddCarCheckUpDto
 import com.infinum.academy.cars.dto.AddCarDto
 import com.infinum.academy.cars.services.CarInfoAdministrationService
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.annotation.ComponentScan
 import org.springframework.http.MediaType
 import org.springframework.test.annotation.Rollback
 import org.springframework.test.context.ActiveProfiles

@@ -3,6 +3,9 @@ package com.infinum.academy.cars.dto
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.infinum.academy.cars.domain.CarInfo
 import com.infinum.academy.cars.domain.CarInfoPrimaryKey
+import org.springframework.hateoas.IanaLinkRelations
+import org.springframework.hateoas.server.core.Relation
+
 
 data class CarInfoDto(
     @JsonProperty("manufacturer") val manName: String,

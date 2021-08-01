@@ -1,33 +1,35 @@
 package com.infinum.academy.cars.controllers
 
-import com.infinum.academy.cars.dto.AddCarCheckUpDto
-import com.infinum.academy.cars.dto.CheckUpDto
+import com.infinum.academy.cars.`resource-assemblers`.CarCheckUpResourceAssembler
+import com.infinum.academy.cars.domain.CarCheckUp
+import com.infinum.academy.cars.resource.CheckUpResource
 import com.infinum.academy.cars.services.CarCheckUpService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.http.MediaType
+import org.springframework.data.web.PagedResourcesAssembler
+import org.springframework.hateoas.PagedModel
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestMapping
 
 @Controller
-@RequestMapping("/checkups")
+@RequestMapping("/cars/{carId}/checkups")
 class CarCheckUpController(
-    private val service: CarCheckUpService
+    private val service: CarCheckUpService,
+    private val resourceAssembler: CarCheckUpResourceAssembler
 ) {
-    @PostMapping
-    fun addCarCheckUp(@RequestBody checkUpDto: AddCarCheckUpDto): ResponseEntity<Unit> {
-        val id = service.addCarCheckUp(checkUpDto)
-        val location = ServletUriComponentsBuilder
-            .fromCurrentRequest()
-            .path("/{id}")
-            .buildAndExpand(id)
-            .toUri()
-        return ResponseEntity.created(location).build()
-    }
-
-    @GetMapping("/car/{carId}", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun allCheckUpsForCar(@PathVariable carId: Long, pageable: Pageable): ResponseEntity<Page<CheckUpDto>> =
-        ResponseEntity.ok(service.getAllCheckUpsForCarId(carId, pageable))
+    @GetMapping
+    fun allCheckUpsForCar(
+        @PathVariable carId: Long,
+        pageable: Pageable,
+        pagedResourcesAssembler: PagedResourcesAssembler<CarCheckUp>
+    ): ResponseEntity<PagedModel<CheckUpResource>> =
+        ResponseEntity.ok(
+            pagedResourcesAssembler.toModel(
+                service.getAllCheckUpsForCarId(carId, pageable),
+                resourceAssembler
+            )
+        )
 }

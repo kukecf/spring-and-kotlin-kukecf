@@ -11,9 +11,11 @@ data class CarCheckUp(
     @SequenceGenerator(name = "CHECKUP_SEQ", sequenceName = "CHECKUP_SEQ", allocationSize = 1)
     val id: Long = 0,
 
-    val date_performed: LocalDateTime,
+    @Column(name="date_performed")
+    val datePerformed: LocalDateTime,
 
-    val worker_name: String,
+    @Column(name="worker_name")
+    val workerName: String,
 
     val price: Float,
 

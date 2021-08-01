@@ -1,10 +1,15 @@
 package com.infinum.academy.cars.controllers
 
+import com.infinum.academy.cars.`resource-assemblers`.CarResourceAssembler
+import com.infinum.academy.cars.domain.Car
 import com.infinum.academy.cars.dto.AddCarDto
-import com.infinum.academy.cars.dto.CarDto
+import com.infinum.academy.cars.resource.CarResource
 import com.infinum.academy.cars.services.CarService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PagedResourcesAssembler
+import org.springframework.hateoas.EntityModel
+import org.springframework.hateoas.PagedModel
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
@@ -14,12 +19,24 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 @Controller
 @RequestMapping("/cars")
 class CarController(
-    private val service: CarService
-) {
+    private val service: CarService,
+    private val resourceAssembler: CarResourceAssembler,
+
+    ) {
 
     @GetMapping
-    fun getAllCars(pageable: Pageable): ResponseEntity<Page<CarDto>> =
-        ResponseEntity.ok(service.getAllCars(pageable))
+    fun getAllCars(
+        pageable: Pageable,
+        pagedResourcesAssembler: PagedResourcesAssembler<Car>
+    ): ResponseEntity<PagedModel<CarResource>> {
+        return ResponseEntity.ok(
+            pagedResourcesAssembler.toModel(
+                service.getAllCars(pageable),
+                resourceAssembler
+            )
+        )
+    }
+
 
     @PostMapping
     fun addNewCar(@RequestBody carDto: AddCarDto): ResponseEntity<Unit> {
@@ -33,8 +50,9 @@ class CarController(
     }
 
     @GetMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun details(@PathVariable id: Long): ResponseEntity<CarDto> {
-        return ResponseEntity.ok(service.getCarDetails(id))
+    fun details(@PathVariable id: Long): ResponseEntity<CarResource> {
+        //return ResponseEntity.ok(service.getCarDetails(id))
+        return ResponseEntity.ok(resourceAssembler.toModel(service.getCar(id)))
     }
 
 }

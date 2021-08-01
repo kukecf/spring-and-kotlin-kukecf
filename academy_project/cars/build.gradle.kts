@@ -8,6 +8,7 @@ plugins {
 	kotlin("plugin.jpa") version "1.5.20"
 	id ("nu.studer.jooq") version "6.0"
 	jacoco
+	id("org.hidetake.swagger.generator") version "2.18.2"
 }
 
 group = "com.infinum.academy"
@@ -41,6 +42,10 @@ dependencies {
 	implementation("org.flywaydb:flyway-core")
 	jooqGenerator("org.postgresql:postgresql:42.2.14")
 	runtimeOnly("org.postgresql:postgresql")
+
+	implementation("org.springframework.boot:spring-boot-starter-hateoas")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
+	swaggerCodegen("org.openapitools:openapi-generator-cli:3.3.4")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.mockk:mockk:1.12.0")

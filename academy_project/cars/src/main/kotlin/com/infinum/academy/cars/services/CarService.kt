@@ -1,9 +1,10 @@
 package com.infinum.academy.cars.services
 
+import com.infinum.academy.cars.`resource-assemblers`.CarResourceAssembler
 import com.infinum.academy.cars.domain.Car
 import com.infinum.academy.cars.domain.CarInfoPrimaryKey
 import com.infinum.academy.cars.dto.AddCarDto
-import com.infinum.academy.cars.dto.CarDto
+import com.infinum.academy.cars.resource.CarResource
 import com.infinum.academy.cars.dto.toCar
 import com.infinum.academy.cars.exceptions.CarInfoNotFoundException
 import com.infinum.academy.cars.exceptions.CarNotFoundException
@@ -29,17 +30,18 @@ class CarService(
         return carRepo.save(car).id
     }
 
-    private fun getCar(carId: Long): Car =
+    fun getCar(carId: Long): Car =
         carRepo.findById(carId) ?: throw CarNotFoundException(carId)
 
 
-    fun getCarDetails(carId: Long): CarDto =
-        CarDto(
+    fun getCarDetails(carId: Long): CarResource =
+        CarResource(
             getCar(carId),
             checkUpRepo.findAllCheckupsForDetails(carId)
         )
 
-    fun getAllCars(pageable: Pageable): Page<CarDto> {
-        return carRepo.findAll(pageable).map { CarDto(it) }
+    fun getAllCars(pageable: Pageable): Page<Car> {
+        //return carRepo.findAll(pageable).map { CarResource(it) }
+        return carRepo.findAll(pageable)
     }
 }
