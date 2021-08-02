@@ -3,6 +3,8 @@ package com.infinum.academy.cars
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.infinum.academy.cars.dto.AddCarCheckUpDto
 import com.infinum.academy.cars.dto.AddCarDto
+import com.infinum.academy.cars.dto.AddSchedCheckUpDto
+import com.infinum.academy.cars.dto.Duration
 import com.infinum.academy.cars.services.CarInfoAdministrationService
 import io.mockk.InternalPlatformDsl.toStr
 import org.junit.jupiter.api.*
@@ -18,12 +20,14 @@ import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Rollback
-@ActiveProfiles(profiles=["test"])
+@ActiveProfiles(profiles = ["test"])
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CarsApplicationTests @Autowired constructor(
     private val mvc: MockMvc,
@@ -122,6 +126,8 @@ class CarsApplicationTests @Autowired constructor(
             jsonPath("$.modelName") { value("150S") }
             jsonPath("$.productionYear") { value("2004") }
             jsonPath("$.serialNumber") { value("89") }
+            jsonPath("$._links.self") { hasJsonPath() }
+            jsonPath("$._links.checkups.href") { value("http://localhost:8080/cars/$id/checkups") }
             content { contentType(MediaType.APPLICATION_JSON) }
             status { is2xxSuccessful() }
         }
@@ -166,6 +172,8 @@ class CarsApplicationTests @Autowired constructor(
             jsonPath("$.modelName") { value("Ugly Duckling") }
             jsonPath("$.productionYear") { value("2004") }
             jsonPath("$.serialNumber") { value("889") }
+            jsonPath("$._links.self") { hasJsonPath() }
+            jsonPath("$._links.checkups.href") { value("http://localhost:8080/cars/$id1/checkups") }
             content { contentType(MediaType.APPLICATION_JSON) }
             status { is2xxSuccessful() }
         }
@@ -179,6 +187,8 @@ class CarsApplicationTests @Autowired constructor(
             jsonPath("$.productionYear") { value("2007") }
             jsonPath("$.serialNumber") { value("988") }
             jsonPath("$.checkUps")
+            jsonPath("$._links.self") { hasJsonPath() }
+            jsonPath("$._links.checkups.href") { value("http://localhost:8080/cars/$id2/checkups") }
             content { contentType(MediaType.APPLICATION_JSON) }
             status { is2xxSuccessful() }
         }
@@ -263,31 +273,26 @@ class CarsApplicationTests @Autowired constructor(
 
         assert(result3.response.getHeaderValue("Location").toStr().contains("http://localhost/checkups/"))
 
-        mvc.get("/cars/{id}", id).andExpect {
+        mvc.get("/cars/{id}/checkups", id).andExpect {
             status { is2xxSuccessful() }
             content { contentType(MediaType.APPLICATION_JSON) }
-            jsonPath("$.id") { value(id) }
-            jsonPath("$.ownerId") { value("3") }
-            jsonPath("$.dateAdded") { value(LocalDate.now().toStr()) }
-            jsonPath("$.manufacturerName") { value("Mazda") }
-            jsonPath("$.modelName") { value("CX-7") }
-            jsonPath("$.productionYear") { value("2004") }
-            jsonPath("$.serialNumber") { value("89") }
-            jsonPath("$.checkups") {
+            jsonPath("$._embedded.item") {
                 isArray()
                 isNotEmpty()
             }
+            jsonPath("$._links.self.href") { hasJsonPath() }
+            jsonPath("$.page.totalElements") { value(2) }
         }
     }
 
+
     @Test
-    @DisplayName("should retrieve list of checkups from checkups endpoint for car")
+    @DisplayName("should get latest checkups")
     @Transactional
     fun test7() {
-        val car = AddCarDto(3, 2004, "89", "Peugeot", "306")
+        val car = AddCarDto(1, 2004, "89", "Berkeley", "QB")
 
-
-        val result = mvc.post("/cars") {
+        val result1 = mvc.post("/cars") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(car)
             accept = MediaType.APPLICATION_JSON
@@ -296,45 +301,175 @@ class CarsApplicationTests @Autowired constructor(
             header { exists("Location") }
         }.andReturn()
 
-        val id = result.response.getHeaderValue("Location").toStr()
+        val id1 = result1.response.getHeaderValue("Location").toStr()
             .removePrefix("http://localhost/cars/")
 
-        val checkup1 = AddCarCheckUpDto("Josip", 2f, id.toLong())
-        val checkup2 = AddCarCheckUpDto("Stef", 2f, id.toLong())
+        val checkupDtos = listOf(
+            AddCarCheckUpDto("Josip", 2f, id1.toLong()),
+            AddCarCheckUpDto("Marko", 2f, id1.toLong()),
+            AddCarCheckUpDto("Ivan", 2f, id1.toLong()),
+            AddCarCheckUpDto("Hrvoje", 2f, id1.toLong())
+        )
 
-        val result2 = mvc.post("/checkups") {
-            contentType = MediaType.APPLICATION_JSON
-            content = mapper.writeValueAsString(checkup1)
-            accept = MediaType.APPLICATION_JSON
-        }.andExpect {
-            status { is2xxSuccessful() }
-            header { exists("Location") }
-        }.andReturn()
+        checkupDtos.forEach {
+            mvc.post("/checkups") {
+                contentType = MediaType.APPLICATION_JSON
+                content = mapper.writeValueAsString(it)
+                accept = MediaType.APPLICATION_JSON
+            }.andExpect {
+                status { is2xxSuccessful() }
+                header { exists("Location") }
+            }
+        }
 
-        assert(result2.response.getHeaderValue("Location").toStr().contains("http://localhost/checkups/"))
-
-        val result3 = mvc.post("/checkups") {
-            contentType = MediaType.APPLICATION_JSON
-            content = mapper.writeValueAsString(checkup2)
-            accept = MediaType.APPLICATION_JSON
-        }.andExpect {
-            status { is2xxSuccessful() }
-            header { exists("Location") }
-        }.andReturn()
-
-        assert(result3.response.getHeaderValue("Location").toStr().contains("http://localhost/checkups/"))
-
-        mvc.get("/checkups/car/{id}", id).andExpect {
+        mvc.get("/checkups?limit=2").andExpect {
             status { is2xxSuccessful() }
             content { contentType(MediaType.APPLICATION_JSON) }
-            jsonPath("$.content") {
-                isArray()
+            jsonPath("$._embedded.item") {
                 isNotEmpty()
+                isArray()
             }
-            jsonPath("$.totalElements") { value(2) }
-            jsonPath("$.totalPages") { value(1) }
+        }
+
+        mvc.get("/checkups").andExpect {
+            status { is2xxSuccessful() }
+            content { contentType(MediaType.APPLICATION_JSON) }
+            jsonPath("$._embedded.item") {
+                isNotEmpty()
+                isArray()
+            }
         }
     }
 
+    @Test
+    @DisplayName("should get checkup by id")
+    @Transactional
+    fun test8() {
+        val car = AddCarDto(1, 2004, "89", "Berkeley", "QB")
+        val result1 = mvc.post("/cars") {
+            contentType = MediaType.APPLICATION_JSON
+            content = mapper.writeValueAsString(car)
+            accept = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { is2xxSuccessful() }
+            header { exists("Location") }
+        }.andReturn()
+
+        val id1 = result1.response.getHeaderValue("Location").toStr()
+            .removePrefix("http://localhost/cars/")
+
+        val checkupDto1 = AddCarCheckUpDto("Josip", 2f, id1.toLong())
+
+        val result = mvc.post("/checkups") {
+            contentType = MediaType.APPLICATION_JSON
+            content = mapper.writeValueAsString(checkupDto1)
+            accept = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { is2xxSuccessful() }
+            header { exists("Location") }
+        }.andReturn()
+
+        val id = result.response.getHeaderValue("Location").toStr()
+            .removePrefix("http://localhost/checkups/")
+
+        mvc.get("/checkups/{id}", id).andExpect {
+            status { is2xxSuccessful() }
+            content { contentType(MediaType.APPLICATION_JSON) }
+            jsonPath("$.id") { value(id) }
+            jsonPath("$.datePerformed") { hasJsonPath() }
+            jsonPath("$.workerName") { value("Josip") }
+            jsonPath("$.price") { value(2f) }
+            jsonPath("$._links.self.href") { hasJsonPath() }
+        }
+    }
+
+    @Test
+    @DisplayName("should schedule a checkup")
+    @Transactional
+    fun test9() {
+        val car = AddCarDto(1, 2004, "89", "Berkeley", "QB")
+        val result1 = mvc.post("/cars") {
+            contentType = MediaType.APPLICATION_JSON
+            content = mapper.writeValueAsString(car)
+            accept = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { is2xxSuccessful() }
+            header { exists("Location") }
+        }.andReturn()
+
+        val id1 = result1.response.getHeaderValue("Location").toStr()
+            .removePrefix("http://localhost/cars/")
+
+        val checkupDto1 = AddSchedCheckUpDto("Josip", 2f, id1.toLong(),Duration.SIX_MONTHS)
+
+        val result = mvc.post("/checkups") {
+            contentType = MediaType.APPLICATION_JSON
+            content = mapper.writeValueAsString(checkupDto1)
+            accept = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { is2xxSuccessful() }
+            header { exists("Location") }
+        }.andReturn()
+
+        val id = result.response.getHeaderValue("Location").toStr()
+            .removePrefix("http://localhost/checkups/")
+
+        mvc.get("/checkups/{id}", id).andExpect {
+            status { is2xxSuccessful() }
+            content { contentType(MediaType.APPLICATION_JSON) }
+            jsonPath("$.id") { value(id) }
+            jsonPath("$.datePerformed") { hasJsonPath() }
+            jsonPath("$.workerName") { value("Josip") }
+            jsonPath("$.price") { value(2f) }
+            jsonPath("$._links.self.href") { hasJsonPath() }
+        }
+    }
+
+    @Test
+    @DisplayName("should generate paged list of upcoming checkups")
+    @Transactional
+    fun test10() {
+        val car = AddCarDto(1, 2004, "89", "Berkeley", "QB")
+        val result1 = mvc.post("/cars") {
+            contentType = MediaType.APPLICATION_JSON
+            content = mapper.writeValueAsString(car)
+            accept = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { is2xxSuccessful() }
+            header { exists("Location") }
+        }.andReturn()
+
+        val id1 = result1.response.getHeaderValue("Location").toStr()
+            .removePrefix("http://localhost/cars/")
+
+        val checkupDtos = listOf(
+            AddSchedCheckUpDto("Josip", 2f, id1.toLong()),
+            AddSchedCheckUpDto("Marko", 2f, id1.toLong()),
+            AddSchedCheckUpDto("Ivan", 2f, id1.toLong()),
+            AddSchedCheckUpDto("Hrvoje", 2f, id1.toLong())
+        )
+
+        checkupDtos.forEach{
+            mvc.post("/checkups") {
+                contentType = MediaType.APPLICATION_JSON
+                content = mapper.writeValueAsString(it)
+                accept = MediaType.APPLICATION_JSON
+            }.andExpect {
+                status { is2xxSuccessful() }
+                header { exists("Location") }
+            }
+        }
+
+        mvc.get("/checkups/upcoming").andExpect {
+            status { is2xxSuccessful() }
+            content { contentType(MediaType.APPLICATION_JSON) }
+            jsonPath("$._embedded.item") {
+                isArray()
+                isNotEmpty()
+            }
+            jsonPath("$._links.self.href") { hasJsonPath() }
+            jsonPath("$.page.totalElements") { value(4) }
+        }
+    }
 
 }

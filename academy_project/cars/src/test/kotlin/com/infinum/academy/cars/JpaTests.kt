@@ -4,11 +4,9 @@ import com.infinum.academy.cars.domain.Car
 import com.infinum.academy.cars.domain.CarCheckUp
 import com.infinum.academy.cars.domain.CarInfo
 import com.infinum.academy.cars.domain.CarInfoPrimaryKey
-import com.infinum.academy.cars.dto.AddCarCheckUpDto
-import com.infinum.academy.cars.dto.AddCarDto
-import com.infinum.academy.cars.dto.toCar
-import com.infinum.academy.cars.dto.toCarCheckUp
-import com.infinum.academy.cars.exceptions.*
+import com.infinum.academy.cars.dto.*
+import com.infinum.academy.cars.exceptions.CarInfoNotFoundException
+import com.infinum.academy.cars.exceptions.CarNotFoundException
 import com.infinum.academy.cars.repository.CarCheckUpRepository
 import com.infinum.academy.cars.repository.CarInfoRepository
 import com.infinum.academy.cars.repository.CarRepository
@@ -25,7 +23,7 @@ import java.time.LocalDateTime
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ActiveProfiles(profiles=["test"])
+@ActiveProfiles(profiles = ["test"])
 class JPATests @Autowired constructor(
     val carRepo: CarRepository,
     val checkupRepo: CarCheckUpRepository,
@@ -45,9 +43,9 @@ class JPATests @Autowired constructor(
         checkupRepo.deleteAll()
         carInfoRepository.deleteAll()
         val fetcher = { id: Long -> carRepo.findById(id) ?: throw CarNotFoundException(id) }
-        carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Peugeot","305"),true))
-        carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Dacia","Sandero"),true))
-        carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Opel","Corsa"),true))
+        carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Peugeot", "305"), true))
+        carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Dacia", "Sandero"), true))
+        carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Opel", "Corsa"), true))
 
 
         val peugeot = AddCarDto(4, 2004, "72", "Peugeot", "305").toCar(infoFetcher)
@@ -66,6 +64,15 @@ class JPATests @Autowired constructor(
                 AddCarCheckUpDto("Mirko", 5f, peugeot.id).toCarCheckUp(fetcher),
                 AddCarCheckUpDto("Josip", 10f, peugeot.id).toCarCheckUp(fetcher),
                 AddCarCheckUpDto("Josip", 2f, dacia.id).toCarCheckUp(fetcher)
+            )
+        )
+
+        checkupRepo.saveAll(
+            listOf(
+                AddSchedCheckUpDto("Josip", 2f, peugeot.id).toCarCheckUp(fetcher),
+                AddSchedCheckUpDto("Mirko", 5f, renault.id).toCarCheckUp(fetcher),
+                AddSchedCheckUpDto("Josip", 10f, renault.id).toCarCheckUp(fetcher),
+                AddSchedCheckUpDto("Josip", 2f, dacia.id).toCarCheckUp(fetcher)
             )
         )
 
@@ -103,7 +110,7 @@ class JPATests @Autowired constructor(
 
     @Test
     fun `can add a checkup and find it`() {
-        carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Zastava","102"),true))
+        carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Zastava", "102"), true))
         val car = Car(
             owner_id = 2,
             date_added = LocalDate.now(),
@@ -126,7 +133,7 @@ class JPATests @Autowired constructor(
     @Test
     fun `can find all checkups`() {
         val checkups = checkupRepo.findAll()
-        assertThat(checkups.size).isEqualTo(4)
+        assertThat(checkups.size).isEqualTo(8)
     }
 
     @Test
@@ -151,17 +158,36 @@ class JPATests @Autowired constructor(
     @Test
     fun `can find all checkups by car id`() {
         val checkups = checkupRepo.findAllCheckupsForDetails(car_example_id)
-        assertThat(checkups.size).isEqualTo(3)
+        assertThat(checkups.size).isEqualTo(4)
     }
 
     @Test
-    fun `can find all checkups by car paged`() {
-        val car = carRepo.findById(car_example_id) ?: throw CarNotFoundException(car_example_id)
-        val pageable = PageRequest.of(0, 2)
-        val checkups = checkupRepo.findAllByCar(car, pageable)
+    fun `can find latest checkups`() {
+        val checkups = checkupRepo.findLatestCheckups(2)
         assertThat(checkups.size).isEqualTo(2)
-        assertThat(checkups.totalPages).isEqualTo(2)
+        val checkups2 = checkupRepo.findLatestCheckups(10)
+        assertThat(checkups2.size).isEqualTo(4)
     }
+
+    @Test
+    fun `can find upcoming checkups within a month`() {
+        val pageable = PageRequest.of(0, 6)
+        val checkups = checkupRepo.findUpcomingWithinMonths(1,pageable)
+        assertThat(checkups.size).isEqualTo(4)
+    }
+
+    @Test
+    fun `can find upcoming checkups within a week`() {
+        val pageable = PageRequest.of(0, 6)
+        val checkups = checkupRepo.findUpcomingWithinWeeks(1,pageable)
+        assertThat(checkups.size).isEqualTo(0)
+        val fetcher = { id: Long -> carRepo.findById(id) ?: throw CarNotFoundException(id) }
+        checkupRepo.save(AddSchedCheckUpDto("Josip",2f,car_example_id,Duration.ONE_WEEK).toCarCheckUp(fetcher))
+        val pageable2 = PageRequest.of(0, 6)
+        val checkups2 = checkupRepo.findUpcomingWithinWeeks(1,pageable2)
+        assertThat(checkups2.size).isEqualTo(1)
+    }
+
 
 
 }

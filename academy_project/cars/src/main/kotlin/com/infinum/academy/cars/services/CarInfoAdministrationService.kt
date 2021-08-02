@@ -10,13 +10,11 @@ class CarInfoAdministrationService(
     private val infoRepository: CarInfoRepository
 ) {
     fun saveModelsFromServer() {
-        service.getModelsFromServer()?.filter {
+        infoRepository.saveAll(service.getModelsFromServer()?.filter {
             infoRepository.existsCarInfoByCarInfoPk(
                 it.carInfoPk
             ).not()
-        }?.forEach {
-            infoRepository.save(it)
-        } ?: throw NoModelsException()
+        } ?: throw NoModelsException())
     }
 
     fun deleteModels() {
