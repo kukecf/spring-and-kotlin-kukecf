@@ -78,7 +78,12 @@ class CarsApplicationTests @Autowired constructor(
 
         mvc.get("/cars").andExpect {
             status { is2xxSuccessful() }
-            jsonPath("content") { isNotEmpty() }
+            jsonPath("_embedded.item") {
+                isNotEmpty()
+                isArray()
+            }
+            jsonPath("$._links.self.href") {hasJsonPath() }
+            jsonPath("$.page.totalElements"){value(2)}
         }
     }
 
@@ -127,7 +132,7 @@ class CarsApplicationTests @Autowired constructor(
             jsonPath("$.productionYear") { value("2004") }
             jsonPath("$.serialNumber") { value("89") }
             jsonPath("$._links.self") { hasJsonPath() }
-            jsonPath("$._links.checkups.href") { value("http://localhost:8080/cars/$id/checkups") }
+            jsonPath("$._links.checkups.href") { value("http://localhost/cars/$id/checkups") }
             content { contentType(MediaType.APPLICATION_JSON) }
             status { is2xxSuccessful() }
         }
@@ -173,7 +178,7 @@ class CarsApplicationTests @Autowired constructor(
             jsonPath("$.productionYear") { value("2004") }
             jsonPath("$.serialNumber") { value("889") }
             jsonPath("$._links.self") { hasJsonPath() }
-            jsonPath("$._links.checkups.href") { value("http://localhost:8080/cars/$id1/checkups") }
+            jsonPath("$._links.checkups.href") { value("http://localhost/cars/$id1/checkups") }
             content { contentType(MediaType.APPLICATION_JSON) }
             status { is2xxSuccessful() }
         }
@@ -188,7 +193,7 @@ class CarsApplicationTests @Autowired constructor(
             jsonPath("$.serialNumber") { value("988") }
             jsonPath("$.checkUps")
             jsonPath("$._links.self") { hasJsonPath() }
-            jsonPath("$._links.checkups.href") { value("http://localhost:8080/cars/$id2/checkups") }
+            jsonPath("$._links.checkups.href") { value("http://localhost/cars/$id2/checkups") }
             content { contentType(MediaType.APPLICATION_JSON) }
             status { is2xxSuccessful() }
         }
@@ -275,7 +280,6 @@ class CarsApplicationTests @Autowired constructor(
 
         mvc.get("/cars/{id}/checkups", id).andExpect {
             status { is2xxSuccessful() }
-            content { contentType(MediaType.APPLICATION_JSON) }
             jsonPath("$._embedded.item") {
                 isArray()
                 isNotEmpty()
@@ -322,21 +326,11 @@ class CarsApplicationTests @Autowired constructor(
             }
         }
 
-        mvc.get("/checkups?limit=2").andExpect {
-            status { is2xxSuccessful() }
-            content { contentType(MediaType.APPLICATION_JSON) }
-            jsonPath("$._embedded.item") {
-                isNotEmpty()
-                isArray()
-            }
-        }
-
         mvc.get("/checkups").andExpect {
             status { is2xxSuccessful() }
-            content { contentType(MediaType.APPLICATION_JSON) }
-            jsonPath("$._embedded.item") {
-                isNotEmpty()
+            jsonPath("$._embedded.item"){
                 isArray()
+                isNotEmpty()
             }
         }
     }
@@ -374,7 +368,6 @@ class CarsApplicationTests @Autowired constructor(
 
         mvc.get("/checkups/{id}", id).andExpect {
             status { is2xxSuccessful() }
-            content { contentType(MediaType.APPLICATION_JSON) }
             jsonPath("$.id") { value(id) }
             jsonPath("$.datePerformed") { hasJsonPath() }
             jsonPath("$.workerName") { value("Josip") }
@@ -416,7 +409,6 @@ class CarsApplicationTests @Autowired constructor(
 
         mvc.get("/checkups/{id}", id).andExpect {
             status { is2xxSuccessful() }
-            content { contentType(MediaType.APPLICATION_JSON) }
             jsonPath("$.id") { value(id) }
             jsonPath("$.datePerformed") { hasJsonPath() }
             jsonPath("$.workerName") { value("Josip") }
@@ -462,7 +454,6 @@ class CarsApplicationTests @Autowired constructor(
 
         mvc.get("/checkups/upcoming").andExpect {
             status { is2xxSuccessful() }
-            content { contentType(MediaType.APPLICATION_JSON) }
             jsonPath("$._embedded.item") {
                 isArray()
                 isNotEmpty()

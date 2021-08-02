@@ -75,9 +75,6 @@ class JPATests @Autowired constructor(
                 AddSchedCheckUpDto("Josip", 2f, dacia.id).toCarCheckUp(fetcher)
             )
         )
-
-        //carInfoService.saveModelsFromServer()
-
     }
 
     @Test
@@ -160,34 +157,5 @@ class JPATests @Autowired constructor(
         val checkups = checkupRepo.findAllCheckupsForDetails(car_example_id)
         assertThat(checkups.size).isEqualTo(4)
     }
-
-    @Test
-    fun `can find latest checkups`() {
-        val checkups = checkupRepo.findLatestCheckups(2)
-        assertThat(checkups.size).isEqualTo(2)
-        val checkups2 = checkupRepo.findLatestCheckups(10)
-        assertThat(checkups2.size).isEqualTo(4)
-    }
-
-    @Test
-    fun `can find upcoming checkups within a month`() {
-        val pageable = PageRequest.of(0, 6)
-        val checkups = checkupRepo.findUpcomingWithinMonths(1,pageable)
-        assertThat(checkups.size).isEqualTo(4)
-    }
-
-    @Test
-    fun `can find upcoming checkups within a week`() {
-        val pageable = PageRequest.of(0, 6)
-        val checkups = checkupRepo.findUpcomingWithinWeeks(1,pageable)
-        assertThat(checkups.size).isEqualTo(0)
-        val fetcher = { id: Long -> carRepo.findById(id) ?: throw CarNotFoundException(id) }
-        checkupRepo.save(AddSchedCheckUpDto("Josip",2f,car_example_id,Duration.ONE_WEEK).toCarCheckUp(fetcher))
-        val pageable2 = PageRequest.of(0, 6)
-        val checkups2 = checkupRepo.findUpcomingWithinWeeks(1,pageable2)
-        assertThat(checkups2.size).isEqualTo(1)
-    }
-
-
 
 }
