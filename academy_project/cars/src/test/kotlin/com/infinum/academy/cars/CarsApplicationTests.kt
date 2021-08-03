@@ -176,7 +176,6 @@ class CarsApplicationTests @Autowired constructor(
             jsonPath("$.serialNumber") { value("889") }
             jsonPath("$._links.self") { hasJsonPath() }
             jsonPath("$._links.checkups.href") { value("http://localhost/cars/$id1/checkups") }
-            content { contentType(MediaType.APPLICATION_JSON) }
             status { is2xxSuccessful() }
         }
 
