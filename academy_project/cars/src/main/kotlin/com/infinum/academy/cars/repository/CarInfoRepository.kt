@@ -12,7 +12,7 @@ interface CarInfoRepository : Repository<CarInfo, CarInfoPrimaryKey> {
 
     fun findByCarInfoPk(carInfoPrimaryKey: CarInfoPrimaryKey): CarInfo?
 
-    fun saveAll(carInfos: Iterable<CarInfo>) : Iterable<CarInfo>
+    fun saveAll(carInfos: Iterable<CarInfo>): Iterable<CarInfo>
 
     fun deleteAll()
 

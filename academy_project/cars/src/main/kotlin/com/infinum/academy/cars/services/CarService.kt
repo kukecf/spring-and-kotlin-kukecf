@@ -1,10 +1,8 @@
 package com.infinum.academy.cars.services
 
-import com.infinum.academy.cars.`resource-assemblers`.CarResourceAssembler
 import com.infinum.academy.cars.domain.Car
 import com.infinum.academy.cars.domain.CarInfoPrimaryKey
 import com.infinum.academy.cars.dto.AddCarDto
-import com.infinum.academy.cars.resource.CarResource
 import com.infinum.academy.cars.dto.toCar
 import com.infinum.academy.cars.exceptions.CarInfoNotFoundException
 import com.infinum.academy.cars.exceptions.CarNotFoundException
@@ -23,9 +21,12 @@ class CarService(
 ) {
     fun addCar(carDto: AddCarDto): Long {
         val car = carDto.toCar { man, model ->
-            carInfoRepo.findByCarInfoPk(CarInfoPrimaryKey( man,model
-            ))
-                ?: throw CarInfoNotFoundException(man,model)
+            carInfoRepo.findByCarInfoPk(
+                CarInfoPrimaryKey(
+                    man, model
+                )
+            )
+                ?: throw CarInfoNotFoundException(man, model)
         }
         return carRepo.save(car).id
     }
@@ -33,15 +34,7 @@ class CarService(
     fun getCar(carId: Long): Car =
         carRepo.findById(carId) ?: throw CarNotFoundException(carId)
 
-
-    fun getCarDetails(carId: Long): CarResource =
-        CarResource(
-            getCar(carId),
-            checkUpRepo.findAllCheckupsForDetails(carId)
-        )
-
     fun getAllCars(pageable: Pageable): Page<Car> {
-        //return carRepo.findAll(pageable).map { CarResource(it) }
         return carRepo.findAll(pageable)
     }
 }

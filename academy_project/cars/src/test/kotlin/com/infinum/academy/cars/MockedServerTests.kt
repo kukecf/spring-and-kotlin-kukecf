@@ -3,20 +3,15 @@ package com.infinum.academy.cars
 import com.infinum.academy.cars.dto.AddCarDto
 import io.mockk.InternalPlatformDsl.toStr
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.runner.RunWith
 import org.mockserver.client.MockServerClient
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.model.MediaType
 import org.mockserver.springtest.MockServerTest
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.PropertySource
-import org.springframework.test.annotation.Rollback
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
@@ -25,7 +20,7 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper
 @SpringBootTest
 @MockServerTest
 @PropertySource("classpath:mockserver.properties")
-@ActiveProfiles(profiles=["test"])
+@ActiveProfiles(profiles = ["test"])
 class MockedServerTest @Autowired constructor(
     private val mvc: MockMvc,
     private val mapper: ObjectMapper
@@ -76,7 +71,7 @@ class MockedServerTest @Autowired constructor(
             )
     }
 
-    fun `should add car`(){
+    fun `should add car`() {
         val car = AddCarDto(1, 2004, "89", "Abarth", "210")
         val result1 = mvc.post("/cars") {
             contentType = org.springframework.http.MediaType.APPLICATION_JSON
@@ -96,7 +91,7 @@ class MockedServerTest @Autowired constructor(
         }
     }
 
-    fun `should fail to add car because of lacking manufacturer name`(){
+    fun `should fail to add car because of lacking manufacturer name`() {
         val car = AddCarDto(1, 2004, "89", "Ford", "210")
         mvc.post("/cars") {
             contentType = org.springframework.http.MediaType.APPLICATION_JSON
@@ -107,7 +102,7 @@ class MockedServerTest @Autowired constructor(
         }
     }
 
-    fun `should fail to add car because of lacking model name`(){
+    fun `should fail to add car because of lacking model name`() {
         val car = AddCarDto(1, 2004, "89", "Abarth", "206")
         mvc.post("/cars") {
             contentType = org.springframework.http.MediaType.APPLICATION_JSON

@@ -1,16 +1,13 @@
 package com.infinum.academy.cars.controllers
 
-import com.infinum.academy.cars.`resource-assemblers`.CarResourceAssembler
+import com.infinum.academy.cars.controllers.assemblers.CarResourceAssembler
 import com.infinum.academy.cars.domain.Car
 import com.infinum.academy.cars.dto.AddCarDto
 import com.infinum.academy.cars.resource.CarResource
 import com.infinum.academy.cars.services.CarService
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PagedResourcesAssembler
-import org.springframework.hateoas.EntityModel
 import org.springframework.hateoas.PagedModel
-import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
@@ -49,9 +46,8 @@ class CarController(
         return ResponseEntity.created(location).build()
     }
 
-    @GetMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    @GetMapping("/{id}")
     fun details(@PathVariable id: Long): ResponseEntity<CarResource> {
-        //return ResponseEntity.ok(service.getCarDetails(id))
         return ResponseEntity.ok(resourceAssembler.toModel(service.getCar(id)))
     }
 

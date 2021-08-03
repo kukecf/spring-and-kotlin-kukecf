@@ -18,6 +18,6 @@ data class CarInfo(
 @Embeddable
 data class CarInfoPrimaryKey(
     val manufacturer: String,
-    @Column(name="model_name")
+    @Column(name = "model_name")
     val modelName: String
 ) : Serializable

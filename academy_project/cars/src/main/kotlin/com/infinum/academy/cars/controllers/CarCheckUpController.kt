@@ -1,10 +1,9 @@
 package com.infinum.academy.cars.controllers
 
-import com.infinum.academy.cars.`resource-assemblers`.CarCheckUpResourceAssembler
+import com.infinum.academy.cars.controllers.assemblers.CarCheckUpResourceAssembler
 import com.infinum.academy.cars.domain.CarCheckUp
 import com.infinum.academy.cars.resource.CheckUpResource
 import com.infinum.academy.cars.services.CarCheckUpService
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PagedResourcesAssembler
 import org.springframework.hateoas.PagedModel

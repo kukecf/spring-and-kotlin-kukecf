@@ -3,8 +3,6 @@ package com.infinum.academy.cars
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.infinum.academy.cars.dto.AddCarCheckUpDto
 import com.infinum.academy.cars.dto.AddCarDto
-import com.infinum.academy.cars.dto.AddSchedCheckUpDto
-import com.infinum.academy.cars.dto.Duration
 import com.infinum.academy.cars.services.CarInfoAdministrationService
 import io.mockk.InternalPlatformDsl.toStr
 import org.junit.jupiter.api.*
@@ -21,7 +19,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
+import java.time.Period
 
 
 @SpringBootTest
@@ -82,8 +80,8 @@ class CarsApplicationTests @Autowired constructor(
                 isNotEmpty()
                 isArray()
             }
-            jsonPath("$._links.self.href") {hasJsonPath() }
-            jsonPath("$.page.totalElements"){value(2)}
+            jsonPath("$._links.self.href") { hasJsonPath() }
+            jsonPath("$.page.totalElements") { value(2) }
         }
     }
 
@@ -133,7 +131,6 @@ class CarsApplicationTests @Autowired constructor(
             jsonPath("$.serialNumber") { value("89") }
             jsonPath("$._links.self") { hasJsonPath() }
             jsonPath("$._links.checkups.href") { value("http://localhost/cars/$id/checkups") }
-            content { contentType(MediaType.APPLICATION_JSON) }
             status { is2xxSuccessful() }
         }
     }
@@ -179,7 +176,6 @@ class CarsApplicationTests @Autowired constructor(
             jsonPath("$.serialNumber") { value("889") }
             jsonPath("$._links.self") { hasJsonPath() }
             jsonPath("$._links.checkups.href") { value("http://localhost/cars/$id1/checkups") }
-            content { contentType(MediaType.APPLICATION_JSON) }
             status { is2xxSuccessful() }
         }
 
@@ -194,7 +190,6 @@ class CarsApplicationTests @Autowired constructor(
             jsonPath("$.checkUps")
             jsonPath("$._links.self") { hasJsonPath() }
             jsonPath("$._links.checkups.href") { value("http://localhost/cars/$id2/checkups") }
-            content { contentType(MediaType.APPLICATION_JSON) }
             status { is2xxSuccessful() }
         }
     }
@@ -219,7 +214,7 @@ class CarsApplicationTests @Autowired constructor(
         val id = result.response.getHeaderValue("Location").toStr()
             .removePrefix("http://localhost/cars/")
 
-        val checkup = AddCarCheckUpDto("Josip", 2f, id.toLong())
+        val checkup = AddCarCheckUpDto("Josip", 2f, id.toLong(), LocalDateTime.now())
 
         mvc.post("/checkups") {
             contentType = MediaType.APPLICATION_JSON
@@ -253,8 +248,8 @@ class CarsApplicationTests @Autowired constructor(
         val id = result.response.getHeaderValue("Location").toStr()
             .removePrefix("http://localhost/cars/")
 
-        val checkup1 = AddCarCheckUpDto("Josip", 2f, id.toLong())
-        val checkup2 = AddCarCheckUpDto("Stef", 2f, id.toLong())
+        val checkup1 = AddCarCheckUpDto("Josip", 2f, id.toLong(), LocalDateTime.now())
+        val checkup2 = AddCarCheckUpDto("Stef", 2f, id.toLong(), LocalDateTime.now())
 
         val result2 = mvc.post("/checkups") {
             contentType = MediaType.APPLICATION_JSON
@@ -309,10 +304,10 @@ class CarsApplicationTests @Autowired constructor(
             .removePrefix("http://localhost/cars/")
 
         val checkupDtos = listOf(
-            AddCarCheckUpDto("Josip", 2f, id1.toLong()),
-            AddCarCheckUpDto("Marko", 2f, id1.toLong()),
-            AddCarCheckUpDto("Ivan", 2f, id1.toLong()),
-            AddCarCheckUpDto("Hrvoje", 2f, id1.toLong())
+            AddCarCheckUpDto("Josip", 2f, id1.toLong(), LocalDateTime.now().minus(Period.ofDays(2))),
+            AddCarCheckUpDto("Marko", 2f, id1.toLong(), LocalDateTime.now().minus(Period.ofDays(2))),
+            AddCarCheckUpDto("Ivan", 2f, id1.toLong(), LocalDateTime.now().minus(Period.ofDays(2))),
+            AddCarCheckUpDto("Hrvoje", 2f, id1.toLong(), LocalDateTime.now().minus(Period.ofDays(2)))
         )
 
         checkupDtos.forEach {
@@ -328,7 +323,7 @@ class CarsApplicationTests @Autowired constructor(
 
         mvc.get("/checkups").andExpect {
             status { is2xxSuccessful() }
-            jsonPath("$._embedded.item"){
+            jsonPath("$._embedded.item") {
                 isArray()
                 isNotEmpty()
             }
@@ -352,7 +347,7 @@ class CarsApplicationTests @Autowired constructor(
         val id1 = result1.response.getHeaderValue("Location").toStr()
             .removePrefix("http://localhost/cars/")
 
-        val checkupDto1 = AddCarCheckUpDto("Josip", 2f, id1.toLong())
+        val checkupDto1 = AddCarCheckUpDto("Josip", 2f, id1.toLong(), LocalDateTime.now().minus(Period.ofDays(2)))
 
         val result = mvc.post("/checkups") {
             contentType = MediaType.APPLICATION_JSON
@@ -393,7 +388,7 @@ class CarsApplicationTests @Autowired constructor(
         val id1 = result1.response.getHeaderValue("Location").toStr()
             .removePrefix("http://localhost/cars/")
 
-        val checkupDto1 = AddSchedCheckUpDto("Josip", 2f, id1.toLong(),Duration.SIX_MONTHS)
+        val checkupDto1 = AddCarCheckUpDto("Josip", 2f, id1.toLong(), LocalDateTime.now().plus(Period.ofMonths(6)))
 
         val result = mvc.post("/checkups") {
             contentType = MediaType.APPLICATION_JSON
@@ -435,13 +430,13 @@ class CarsApplicationTests @Autowired constructor(
             .removePrefix("http://localhost/cars/")
 
         val checkupDtos = listOf(
-            AddSchedCheckUpDto("Josip", 2f, id1.toLong()),
-            AddSchedCheckUpDto("Marko", 2f, id1.toLong()),
-            AddSchedCheckUpDto("Ivan", 2f, id1.toLong()),
-            AddSchedCheckUpDto("Hrvoje", 2f, id1.toLong())
+            AddCarCheckUpDto("Josip", 2f, id1.toLong(), LocalDateTime.now().plus(Period.ofMonths(1))),
+            AddCarCheckUpDto("Marko", 2f, id1.toLong(), LocalDateTime.now().plus(Period.ofMonths(1))),
+            AddCarCheckUpDto("Ivan", 2f, id1.toLong(), LocalDateTime.now().plus(Period.ofMonths(1))),
+            AddCarCheckUpDto("Hrvoje", 2f, id1.toLong(), LocalDateTime.now().plus(Period.ofMonths(1)))
         )
 
-        checkupDtos.forEach{
+        checkupDtos.forEach {
             mvc.post("/checkups") {
                 contentType = MediaType.APPLICATION_JSON
                 content = mapper.writeValueAsString(it)
