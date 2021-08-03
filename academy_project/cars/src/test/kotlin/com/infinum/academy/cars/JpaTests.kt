@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Period
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -60,19 +61,27 @@ class JPATests @Autowired constructor(
 
         checkupRepo.saveAll(
             listOf(
-                AddCarCheckUpDto("Josip", 2f, peugeot.id).toCarCheckUp(fetcher),
-                AddCarCheckUpDto("Mirko", 5f, peugeot.id).toCarCheckUp(fetcher),
-                AddCarCheckUpDto("Josip", 10f, peugeot.id).toCarCheckUp(fetcher),
-                AddCarCheckUpDto("Josip", 2f, dacia.id).toCarCheckUp(fetcher)
+                AddCarCheckUpDto("Josip", 2f, peugeot.id, LocalDateTime.now()).toCarCheckUp(fetcher),
+                AddCarCheckUpDto("Mirko", 5f, peugeot.id, LocalDateTime.now()).toCarCheckUp(fetcher),
+                AddCarCheckUpDto("Josip", 10f, peugeot.id, LocalDateTime.now()).toCarCheckUp(fetcher),
+                AddCarCheckUpDto("Josip", 2f, dacia.id, LocalDateTime.now()).toCarCheckUp(fetcher)
             )
         )
 
         checkupRepo.saveAll(
             listOf(
-                AddSchedCheckUpDto("Josip", 2f, peugeot.id).toCarCheckUp(fetcher),
-                AddSchedCheckUpDto("Mirko", 5f, renault.id).toCarCheckUp(fetcher),
-                AddSchedCheckUpDto("Josip", 10f, renault.id).toCarCheckUp(fetcher),
-                AddSchedCheckUpDto("Josip", 2f, dacia.id).toCarCheckUp(fetcher)
+                AddCarCheckUpDto("Josip", 2f, peugeot.id, LocalDateTime.now().plus(Period.ofMonths(1))).toCarCheckUp(
+                    fetcher
+                ),
+                AddCarCheckUpDto("Mirko", 5f, renault.id, LocalDateTime.now().plus(Period.ofMonths(1))).toCarCheckUp(
+                    fetcher
+                ),
+                AddCarCheckUpDto("Josip", 10f, renault.id, LocalDateTime.now().plus(Period.ofMonths(1))).toCarCheckUp(
+                    fetcher
+                ),
+                AddCarCheckUpDto("Josip", 2f, dacia.id, LocalDateTime.now().plus(Period.ofMonths(1))).toCarCheckUp(
+                    fetcher
+                )
             )
         )
     }
@@ -88,18 +97,18 @@ class JPATests @Autowired constructor(
         val pageable = PageRequest.of(0, 2)
         val allCars = carRepo.findAll(pageable)
         assertThat(allCars.size).isEqualTo(2)
-        assertThat(allCars.content[0].serial_number).isEqualTo("72")
+        assertThat(allCars.content[0].serialNumber).isEqualTo("72")
     }
 
     @Test
     fun `can add a car and find it`() {
         val car = Car(
-            owner_id = 2,
-            date_added = LocalDate.now(),
+            ownerId = 2,
+            dateAdded = LocalDate.now(),
             info = carInfoRepository.findByCarInfoPk(CarInfoPrimaryKey("Peugeot", "305"))
                 ?: throw CarInfoNotFoundException("Peugeot", "305"),
-            production_year = 1989,
-            serial_number = "800"
+            productionYear = 1989,
+            serialNumber = "800"
         )
         val id = carRepo.save(car).id
         assertThat(car).isEqualTo(carRepo.findById(id))
@@ -109,12 +118,12 @@ class JPATests @Autowired constructor(
     fun `can add a checkup and find it`() {
         carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Zastava", "102"), true))
         val car = Car(
-            owner_id = 2,
-            date_added = LocalDate.now(),
+            ownerId = 2,
+            dateAdded = LocalDate.now(),
             info = carInfoRepository.findByCarInfoPk(CarInfoPrimaryKey("Zastava", "102"))
                 ?: throw CarInfoNotFoundException("Zastava", "102"),
-            production_year = 1989,
-            serial_number = "800"
+            productionYear = 1989,
+            serialNumber = "800"
         )
         val id = carRepo.save(car).id
         val checkup = CarCheckUp(
@@ -135,9 +144,8 @@ class JPATests @Autowired constructor(
 
     @Test
     fun `can find all checkups for a car paged`() {
-        val car = carRepo.findById(car_example_id) ?: throw CarNotFoundException(car_example_id)
         val pageable = PageRequest.of(0, 2)
-        val checkups = checkupRepo.findAllByCar(car, pageable)
+        val checkups = checkupRepo.findAllByCarId(car_example_id, pageable)
         assertThat(checkups.size).isEqualTo(2)
         assertThat(checkups.content[0].workerName).isEqualTo("Josip")
     }
@@ -146,7 +154,7 @@ class JPATests @Autowired constructor(
     fun `can find car by id only if exists`() {
         val car = carRepo.findById(car_example_id)
         assertThat(car).isNotNull
-        assertThat(car?.production_year).isEqualTo(2004)
+        assertThat(car?.productionYear).isEqualTo(2004)
 
         val car2 = carRepo.findById(-2)
         assertThat(car2).isNull()

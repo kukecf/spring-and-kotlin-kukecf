@@ -1,8 +1,7 @@
-package com.infinum.academy.cars.`resource-assemblers`
+package com.infinum.academy.cars.controllers.assemblers
 
 import com.infinum.academy.cars.controllers.CarCheckUpController
 import com.infinum.academy.cars.controllers.CarController
-import com.infinum.academy.cars.controllers.CheckUpController
 import com.infinum.academy.cars.domain.Car
 import com.infinum.academy.cars.domain.CarCheckUp
 import com.infinum.academy.cars.resource.CarResource

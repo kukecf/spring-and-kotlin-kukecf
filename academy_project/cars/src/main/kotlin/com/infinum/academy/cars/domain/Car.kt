@@ -4,20 +4,20 @@ import java.time.LocalDate
 import javax.persistence.*
 
 @Entity
-@Table(name = "cars", uniqueConstraints = [UniqueConstraint(columnNames = ["serial_number"])])
+@Table(name = "cars", uniqueConstraints = [UniqueConstraint(columnNames = ["serialNumber"])])
 data class Car(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CAR_SEQ")
     @SequenceGenerator(name = "CAR_SEQ", sequenceName = "CAR_SEQ", allocationSize = 1)
     val id: Long = 0,
 
-    val owner_id: Long,
+    val ownerId: Long,
 
-    val date_added: LocalDate,
+    val dateAdded: LocalDate,
 
-    val production_year: Int,
+    val productionYear: Int,
 
-    val serial_number: String,
+    val serialNumber: String,
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     val info: CarInfo

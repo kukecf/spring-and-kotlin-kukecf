@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.MockMvc
 
 @WebMvcTest
 @AutoConfigureMockMvc
-@ActiveProfiles(profiles=["test"])
+@ActiveProfiles(profiles = ["test"])
 class CarsSliceTests @Autowired constructor(
     private val mvc: MockMvc,
     private val mapper: ObjectMapper

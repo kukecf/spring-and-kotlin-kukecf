@@ -24,19 +24,14 @@ data class CarResource(
 
     val serialNumber: String,
 
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    val checkups: List<CheckUpResource> = emptyList()
 ) : RepresentationModel<CarResource>() {
-    constructor(car: Car, checkups: List<CarCheckUp>) : this(
+    constructor(car: Car) : this(
         car.id,
-        car.owner_id,
-        car.date_added,
+        car.ownerId,
+        car.dateAdded,
         car.info.carInfoPk.manufacturer,
         car.info.carInfoPk.modelName,
-        car.production_year,
-        car.serial_number,
-        checkups.map { CheckUpResource(it) }
+        car.productionYear,
+        car.serialNumber,
     )
-
-    constructor(car: Car) : this(car, emptyList())
 }

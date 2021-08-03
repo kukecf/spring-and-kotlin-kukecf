@@ -1,23 +1,19 @@
 package com.infinum.academy.cars.dto
 
+import java.time.LocalDateTime
+import java.time.Period
 import java.time.temporal.ChronoUnit
-import java.time.temporal.TemporalUnit
 
 enum class Duration {
     ONE_WEEK,
     ONE_MONTH,
-    SIX_MONTHS
-}
+    SIX_MONTHS;
 
-fun parseDuration(duration:Duration) : TimeInterval {
-    return when(duration){
-        Duration.ONE_WEEK -> TimeInterval(1,ChronoUnit.WEEKS)
-        Duration.ONE_MONTH -> TimeInterval(1,ChronoUnit.MONTHS)
-        Duration.SIX_MONTHS -> TimeInterval(6,ChronoUnit.MONTHS)
+    fun toPeriod() : Period{
+        return when(this){
+            ONE_WEEK -> Period.ofWeeks(1)
+            ONE_MONTH -> Period.ofMonths(1)
+            SIX_MONTHS -> Period.ofMonths(6)
+        }
     }
 }
-
-data class TimeInterval(
-    val quant : Int,
-    val unit : ChronoUnit
-)

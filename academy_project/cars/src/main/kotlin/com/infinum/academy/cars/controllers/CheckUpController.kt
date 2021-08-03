@@ -1,11 +1,9 @@
 package com.infinum.academy.cars.controllers
 
-import com.infinum.academy.cars.`resource-assemblers`.CarCheckUpResourceAssembler
+import com.infinum.academy.cars.controllers.assemblers.CarCheckUpResourceAssembler
 import com.infinum.academy.cars.domain.CarCheckUp
 import com.infinum.academy.cars.dto.AddCarCheckUpDto
-import com.infinum.academy.cars.dto.AddSchedCheckUpDto
 import com.infinum.academy.cars.dto.Duration
-import com.infinum.academy.cars.exceptions.CarCheckUpNotFoundException
 import com.infinum.academy.cars.resource.CheckUpResource
 import com.infinum.academy.cars.services.CarCheckUpService
 import org.springframework.data.domain.Pageable
@@ -35,11 +33,12 @@ class CheckUpController(
     }
 
     @GetMapping
-    fun latestCheckups(@RequestParam(defaultValue = "10") limit: Int): ResponseEntity<CollectionModel<CheckUpResource>> {
+    fun latestCheckups(
+        @RequestParam(defaultValue = "10") limit: Int,
+    ): ResponseEntity<CollectionModel<CheckUpResource>> {
         return ResponseEntity.ok(
             resourceAssembler.toCollectionModel(
-                //service.getAllCheckupsDesc().take(10)
-                service.getLatestCheckups(limit)
+                service.getLatestCheckups()
             )
         )
     }
@@ -53,11 +52,6 @@ class CheckUpController(
         )
     }
 
-    @PostMapping("/scheduled")
-    fun scheduleAppointment(@RequestBody checkUpDto: AddSchedCheckUpDto): ResponseEntity<Unit> {
-        return ResponseEntity.ok(service.makeAppointment(checkUpDto))
-    }
-
     @GetMapping("/upcoming")
     fun getUpcomingCheckupAppointments(
         @RequestParam(defaultValue = "ONE_MONTH") duration: Duration,
@@ -66,7 +60,7 @@ class CheckUpController(
     ): ResponseEntity<PagedModel<CheckUpResource>> {
         return ResponseEntity.ok(
             pagedResourcesAssembler.toModel(
-                service.getUpcomingCheckupsInInterval(duration,pageable),
+                service.getUpcomingCheckupsInInterval(duration, pageable),
                 resourceAssembler
             )
         )
