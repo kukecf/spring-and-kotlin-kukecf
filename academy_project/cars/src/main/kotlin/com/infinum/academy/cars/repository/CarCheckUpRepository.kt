@@ -17,7 +17,7 @@ interface CarCheckUpRepository : Repository<CarCheckUp, Long> {
 
     fun findAll(): List<CarCheckUp>
 
-    fun findAllByOrderByDatePerformedDesc(): List<CarCheckUp>
+    fun findAllByDatePerformedLessThanOrderByDatePerformedDesc(date:LocalDateTime,pageable:Pageable): Page<CarCheckUp>
 
     @Query("select check from CarCheckUp check join fetch Car car on car.id=check.car.id where check.car.id = :carId order by check.datePerformed desc")
     fun findAllCheckupsForDetails(carId: Long): List<CarCheckUp>

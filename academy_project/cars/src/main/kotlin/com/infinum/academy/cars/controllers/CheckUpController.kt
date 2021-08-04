@@ -32,13 +32,15 @@ class CheckUpController(
         return ResponseEntity.created(location).build()
     }
 
-    @GetMapping
+    @GetMapping("/latest")
     fun latestCheckups(
         @RequestParam(defaultValue = "10") limit: Int,
-    ): ResponseEntity<CollectionModel<CheckUpResource>> {
+        pagedResourcesAssembler : PagedResourcesAssembler<CarCheckUp>
+    ): ResponseEntity<PagedModel<CheckUpResource>> {
         return ResponseEntity.ok(
-            resourceAssembler.toCollectionModel(
-                service.getLatestCheckups()
+            pagedResourcesAssembler.toModel(
+                service.getLatestCheckups(Pageable.ofSize(limit)),
+                resourceAssembler
             )
         )
     }
