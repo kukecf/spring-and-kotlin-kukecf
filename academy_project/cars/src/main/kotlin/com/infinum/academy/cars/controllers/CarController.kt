@@ -2,6 +2,7 @@ package com.infinum.academy.cars.controllers
 
 import com.infinum.academy.cars.controllers.assemblers.CarResourceAssembler
 import com.infinum.academy.cars.domain.Car
+import com.infinum.academy.cars.domain.CarCheckUp
 import com.infinum.academy.cars.dto.AddCarDto
 import com.infinum.academy.cars.resource.CarResource
 import com.infinum.academy.cars.services.CarService
@@ -50,5 +51,19 @@ class CarController(
     fun details(@PathVariable id: Long): ResponseEntity<CarResource> {
         return ResponseEntity.ok(resourceAssembler.toModel(service.getCar(id)))
     }
+
+    @GetMapping("/{manufacturer}_{model}")
+    fun allCarsWithModelInfo(
+        @PathVariable manufacturer: String,
+        @PathVariable model: String,
+        pageable: Pageable,
+        pagedResourcesAssembler: PagedResourcesAssembler<Car>
+    ): ResponseEntity<PagedModel<CarResource>> =
+        ResponseEntity.ok(
+            pagedResourcesAssembler.toModel(
+                service.getAllCarsForSameModel(manufacturer, model, pageable),
+                resourceAssembler
+            )
+        )
 
 }

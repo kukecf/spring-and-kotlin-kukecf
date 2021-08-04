@@ -13,7 +13,7 @@ class CarCheckUpResourceAssembler : RepresentationModelAssemblerSupport<CarCheck
     CheckUpController::class.java, CheckUpResource::class.java
 ) {
     override fun toModel(entity: CarCheckUp): CheckUpResource {
-        return createModelWithId(entity.id, entity).apply{
+        return createModelWithId(entity.id, entity).apply {
             add(
                 linkTo<CarController> {
                     details(entity.car.id)

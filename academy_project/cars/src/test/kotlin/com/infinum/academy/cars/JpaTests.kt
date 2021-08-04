@@ -4,7 +4,10 @@ import com.infinum.academy.cars.domain.Car
 import com.infinum.academy.cars.domain.CarCheckUp
 import com.infinum.academy.cars.domain.CarInfo
 import com.infinum.academy.cars.domain.CarInfoPrimaryKey
-import com.infinum.academy.cars.dto.*
+import com.infinum.academy.cars.dto.AddCarCheckUpDto
+import com.infinum.academy.cars.dto.AddCarDto
+import com.infinum.academy.cars.dto.toCar
+import com.infinum.academy.cars.dto.toCarCheckUp
 import com.infinum.academy.cars.exceptions.CarInfoNotFoundException
 import com.infinum.academy.cars.exceptions.CarNotFoundException
 import com.infinum.academy.cars.repository.CarCheckUpRepository

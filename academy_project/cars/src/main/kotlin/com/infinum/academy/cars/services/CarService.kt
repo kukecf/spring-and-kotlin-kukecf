@@ -37,4 +37,8 @@ class CarService(
     fun getAllCars(pageable: Pageable): Page<Car> {
         return carRepo.findAll(pageable)
     }
+
+    fun getAllCarsForSameModel(manufacturer:String, model:String, pageable:Pageable) : Page<Car>{
+        return carRepo.findAllByInfo(manufacturer,model,pageable)
+    }
 }

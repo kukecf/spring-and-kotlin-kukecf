@@ -1,8 +1,6 @@
 package com.infinum.academy.cars.resource
 
-import com.fasterxml.jackson.annotation.JsonInclude
 import com.infinum.academy.cars.domain.Car
-import com.infinum.academy.cars.domain.CarCheckUp
 import org.springframework.hateoas.IanaLinkRelations
 import org.springframework.hateoas.RepresentationModel
 import org.springframework.hateoas.server.core.Relation
@@ -24,7 +22,7 @@ data class CarResource(
 
     val serialNumber: String,
 
-) : RepresentationModel<CarResource>() {
+    ) : RepresentationModel<CarResource>() {
     constructor(car: Car) : this(
         car.id,
         car.ownerId,
