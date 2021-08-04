@@ -1,9 +1,11 @@
 package com.infinum.academy.cars.exceptions
 
-import org.springframework.http.HttpStatus
-import org.springframework.web.server.ResponseStatusException
+abstract class NotFoundException(message:String) : RuntimeException(message)
 
-class CarNotFoundException(id: Long) : ResponseStatusException(HttpStatus.NOT_FOUND, "Car with ID $id does not exist!")
-class CarCheckUpNotFoundException(id: Long) : ResponseStatusException(HttpStatus.NOT_FOUND, "Checkup with ID $id does not exist!")
-class CarInfoNotFoundException(man:String,model:String) : ResponseStatusException(HttpStatus.NOT_FOUND, "Car info for $man $model does not exist!")
-class NoModelsException() : ResponseStatusException(HttpStatus.NOT_FOUND, "No models found on server!")
+class CarNotFoundException(id: Long) : NotFoundException("Car with ID $id does not exist!")
+
+class CarCheckUpNotFoundException(id: Long) : NotFoundException("Checkup with ID $id does not exist!")
+
+class CarInfoNotFoundException(man: String, model: String) : NotFoundException("Car info for $man $model does not exist!")
+
+class NoModelsException() : NotFoundException("No models found on server!")

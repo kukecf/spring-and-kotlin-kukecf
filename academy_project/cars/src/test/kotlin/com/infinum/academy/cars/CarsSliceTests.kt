@@ -1,26 +1,18 @@
 package com.infinum.academy.cars
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.infinum.academy.cars.dto.AddCarDto
-import com.infinum.academy.cars.dto.CheckUpDto
-import com.infinum.academy.cars.dto.toCar
-import com.infinum.academy.cars.exceptions.CarCheckUpNotFoundException
-import com.infinum.academy.cars.exceptions.CarNotFoundException
 import com.infinum.academy.cars.services.CarCheckUpService
 import com.infinum.academy.cars.services.CarService
 import com.ninjasquad.springmockk.MockkBean
-import io.mockk.every
-import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
-import java.time.LocalDateTime
 
 @WebMvcTest
 @AutoConfigureMockMvc
-@ActiveProfiles(profiles=["test"])
+@ActiveProfiles(profiles = ["test"])
 class CarsSliceTests @Autowired constructor(
     private val mvc: MockMvc,
     private val mapper: ObjectMapper
@@ -42,7 +34,7 @@ class CarsSliceTests @Autowired constructor(
         ).toCar()
         every {
             checkupService.getCarCheckUp(1)
-        } returns CheckUpDto(
+        } returns CheckUpResource(
             2,
             LocalDateTime.now(),
             "Josip",

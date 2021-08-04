@@ -7,12 +7,13 @@ import java.time.LocalDateTime
 data class AddCarCheckUpDto(
     val workerName: String,
     val price: Float,
-    val carId: Long
+    val carId: Long,
+    val date: LocalDateTime
 )
 
 fun AddCarCheckUpDto.toCarCheckUp(carFetcher: (Long) -> Car) = CarCheckUp(
-    date_performed = LocalDateTime.now(),
-    worker_name = workerName,
+    datePerformed = date,
+    workerName = workerName,
     price = price,
     car = carFetcher.invoke(this.carId)
 )

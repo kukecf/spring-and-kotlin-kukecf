@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled
 class SchedulingConfig(
     private val service: CarInfoAdministrationService
 ) {
-    @Scheduled(fixedRate = 86_400_000)
+    @Scheduled(fixedRateString = "\${car.info.schedule.interval}")
     fun fetchCarInfoIntoDB() {
         service.saveModelsFromServer()
     }
