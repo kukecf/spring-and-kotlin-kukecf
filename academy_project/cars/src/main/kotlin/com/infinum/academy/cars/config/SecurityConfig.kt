@@ -31,11 +31,14 @@ class SecurityConfig {
                 sessionCreationPolicy = SessionCreationPolicy.STATELESS
             }
             authorizeRequests {
-                authorize(HttpMethod.GET, "/movies", permitAll)
-                authorize( HttpMethod.POST, "/movies", hasAuthority("SCOPE_MOVIE_MANAGER") )
-//                authorize( HttpMethod.POST, "/directors", hasAuthority("SCOPE_DIRECTOR_MANAGER"))
-                authorize(anyRequest, authenticated)
+                authorize(HttpMethod.GET, "/models", permitAll)
+                authorize( HttpMethod.POST, "/cars", authenticated)
+                authorize( HttpMethod.GET, "/cars", hasAuthority("SCOPE_ADMIN"))
+                authorize( HttpMethod.GET, "/cars/**", authenticated)
+                authorize( HttpMethod.GET, "/cars/**/checkups", authenticated)
+                authorize(anyRequest, hasAuthority("SCOPE_ADMIN"))
             }
+            formLogin{}
             oauth2ResourceServer {
                 jwt {}
             }
@@ -47,14 +50,25 @@ class SecurityConfig {
     fun userDetailsService() : UserDetailsService {
         return InMemoryUserDetailsManager().apply {
             createUser(
-                User.withUsername("marko")
-                    .password("{bcrypt}\$2a\$10\$H9kQul9XwNtOKSya.aEus.BxSpWair1.yJn3rRHjaFdAI7gJlpZEa")
-                    .authorities("MOVIE_ADD").build())
+                User.withUsername("admin")
+                    .password("{bcrypt}$2a$10\$jmeu32gy.pLbvLRAnjXboe/W1abr/vh3G6Otn52SvABOfV3fVHsYu") //admin123
+                    .roles("ADMIN")
+                    .build()
+            )
 
             createUser(
                 User.withUsername("ivan")
-                    .password("{bcrypt}\$2a\$10\$QNi1cmyWu3BYq6IMw1CeZ.QNPsPH.unnASxHkbIlj.rgKmsiQgbVe")
-                    .authorities("ROLE_USER").build())
+                    .password("{bcrypt}\$2a\$10\$xK.5a7F4CY98451yA/qBsezVmDR0ZEHuijVLPRR5.oo05MMHplJsa") //ivan123
+                    .roles("USER")
+                    .build()
+            )
+
+            createUser(
+                User.withUsername("hodor")
+                    .password("{bcrypt}\$2a\$10\$tilD99Hvu/ju2SHLerAS8ewBvhdSV1fJ2IPzqepZZ/BGe9EGAftpG") //hodor123
+                    .roles("USER")
+                    .build()
+            )
         }
     }
 

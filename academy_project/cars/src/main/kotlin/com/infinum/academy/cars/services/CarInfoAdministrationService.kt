@@ -1,6 +1,7 @@
 package com.infinum.academy.cars.services
 
 import com.infinum.academy.cars.domain.CarInfo
+import com.infinum.academy.cars.domain.CarInfoPrimaryKey
 import com.infinum.academy.cars.exceptions.NoModelsException
 import com.infinum.academy.cars.repository.CarInfoRepository
 import org.springframework.data.domain.Page
@@ -26,5 +27,9 @@ class CarInfoAdministrationService(
 
     fun getAllModelsInShop(pageable: Pageable): Page<CarInfo> {
         return infoRepository.findModelsWhichExistInShop(pageable)
+    }
+
+    fun getModelWithId(manufacturer: String, model: String): CarInfo {
+        return infoRepository.findByCarInfoPk(CarInfoPrimaryKey(manufacturer, model)) ?: throw NoModelsException()
     }
 }

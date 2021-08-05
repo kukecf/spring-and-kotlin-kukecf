@@ -16,17 +16,19 @@ class CarInfoResourceAssembler : RepresentationModelAssemblerSupport<CarInfo, Ca
     CarInfoController::class.java, CarInfoResource::class.java
 ) {
     override fun toModel(entity: CarInfo): CarInfoResource {
-        return createModelWithId(entity.carInfoPk, entity).apply {
-            add(
-                linkTo<CarController> {
-                    allCarsWithModelInfo(
-                        entity.carInfoPk.manufacturer,
-                        entity.carInfoPk.modelName,
-                        Pageable.unpaged(),
-                        PagedResourcesAssembler<Car>(null, null)
-                    )
-                }.withRel("cars")
-            )
+        entity.carInfoPk.let {
+            return createModelWithId("${it.manufacturer}${it.modelName}", entity).apply {
+                add(
+                    linkTo<CarController> {
+                        allCarsWithModelInfo(
+                            it.manufacturer,
+                            it.modelName,
+                            Pageable.unpaged(),
+                            PagedResourcesAssembler<Car>(null, null)
+                        )
+                    }.withRel("cars")
+                )
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package com.infinum.academy.cars.repository
 
+import com.infinum.academy.cars.domain.Car
 import com.infinum.academy.cars.domain.CarCheckUp
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -17,18 +18,25 @@ interface CarCheckUpRepository : Repository<CarCheckUp, Long> {
 
     fun findAll(): List<CarCheckUp>
 
-    fun findAllByDatePerformedLessThanOrderByDatePerformedDesc(date:LocalDateTime,pageable:Pageable): Page<CarCheckUp>
+    fun findAllByDatePerformedLessThanOrderByDatePerformedDesc(
+        date: LocalDateTime,
+        pageable: Pageable
+    ): Page<CarCheckUp>
 
     @Query("select check from CarCheckUp check join fetch Car car on car.id=check.car.id where check.car.id = :carId order by check.datePerformed desc")
     fun findAllCheckupsForDetails(carId: Long): List<CarCheckUp>
 
     fun findAllByCarId(id: Long, pageable: Pageable): Page<CarCheckUp>
 
-    fun findByDatePerformedBetween(
+    fun findByDatePerformedBetweenOrderByDatePerformed(
         startDate: LocalDateTime,
         endDate: LocalDateTime,
         pageable: Pageable
     ): Page<CarCheckUp>
 
     fun deleteAll()
+
+    fun deleteAllByCarId(id:Long)
+
+    fun deleteById(id: Long)
 }

@@ -52,7 +52,7 @@ class CarController(
         return ResponseEntity.ok(resourceAssembler.toModel(service.getCar(id)))
     }
 
-    @GetMapping("/{manufacturer}_{model}")
+    @GetMapping("/{manufacturer}{model}")
     fun allCarsWithModelInfo(
         @PathVariable manufacturer: String,
         @PathVariable model: String,

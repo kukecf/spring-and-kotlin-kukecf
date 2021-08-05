@@ -12,6 +12,7 @@ import com.infinum.academy.cars.repository.CarRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import javax.transaction.Transactional
 
 @Service
 class CarService(
@@ -39,6 +40,12 @@ class CarService(
     }
 
     fun getAllCarsForSameModel(manufacturer:String, model:String, pageable:Pageable) : Page<Car>{
-        return carRepo.findAllByInfo(manufacturer,model,pageable)
+        return carRepo.findAllByInfoCarInfoPk(CarInfoPrimaryKey(manufacturer,model),pageable)
+    }
+
+    @Transactional
+    fun deleteCar(id:Long){
+        checkUpRepo.deleteAllByCarId(id)
+        carRepo.deleteById(id)
     }
 }

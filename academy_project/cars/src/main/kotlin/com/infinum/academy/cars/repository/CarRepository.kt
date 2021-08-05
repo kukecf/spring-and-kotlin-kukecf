@@ -1,6 +1,8 @@
 package com.infinum.academy.cars.repository
 
 import com.infinum.academy.cars.domain.Car
+import com.infinum.academy.cars.domain.CarInfo
+import com.infinum.academy.cars.domain.CarInfoPrimaryKey
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
@@ -18,12 +20,9 @@ interface CarRepository : Repository<Car, Long> {
 
     fun findAll(): List<Car>
 
-    @Query(
-        "select car from Car car" +
-                " where car.info.carInfoPk.manufacturer = :manufacturer" +
-                " and car.info.carInfoPk.modelName = :model"
-    )
-    fun findAllByInfo(manufacturer: String, model: String, pageable: Pageable): Page<Car>
+    fun findAllByInfoCarInfoPk(infoPk: CarInfoPrimaryKey, pageable: Pageable): Page<Car>
 
     fun deleteAll()
+
+    fun deleteById(id: Long)
 }

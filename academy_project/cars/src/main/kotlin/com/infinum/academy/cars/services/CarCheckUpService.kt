@@ -41,11 +41,14 @@ class CarCheckUpService(
     }
 
     fun getUpcomingCheckupsInInterval(duration: Duration, pageable: Pageable): Page<CarCheckUp> {
-        return checkUpRepo.findByDatePerformedBetween(
+        return checkUpRepo.findByDatePerformedBetweenOrderByDatePerformed(
             LocalDateTime.now(),
             LocalDateTime.now().plus(duration.toPeriod()),
             pageable
         )
     }
 
+    fun deleteCheckup(id:Long){
+        checkUpRepo.deleteById(id)
+    }
 }
