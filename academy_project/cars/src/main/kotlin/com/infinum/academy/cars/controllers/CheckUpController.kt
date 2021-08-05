@@ -8,7 +8,6 @@ import com.infinum.academy.cars.resource.CheckUpResource
 import com.infinum.academy.cars.services.CarCheckUpService
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PagedResourcesAssembler
-import org.springframework.hateoas.CollectionModel
 import org.springframework.hateoas.PagedModel
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
@@ -35,7 +34,7 @@ class CheckUpController(
     @GetMapping("/latest")
     fun latestCheckups(
         @RequestParam(defaultValue = "10") limit: Int,
-        pagedResourcesAssembler : PagedResourcesAssembler<CarCheckUp>
+        pagedResourcesAssembler: PagedResourcesAssembler<CarCheckUp>
     ): ResponseEntity<PagedModel<CheckUpResource>> {
         return ResponseEntity.ok(
             pagedResourcesAssembler.toModel(

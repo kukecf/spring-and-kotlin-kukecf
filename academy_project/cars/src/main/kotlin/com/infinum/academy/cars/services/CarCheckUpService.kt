@@ -26,8 +26,8 @@ class CarCheckUpService(
         return checkUpRepo.save(checkUp).id
     }
 
-    fun getLatestCheckups(pageable:Pageable): Page<CarCheckUp> {
-        return checkUpRepo.findAllByDatePerformedLessThanOrderByDatePerformedDesc(LocalDateTime.now(),pageable)
+    fun getLatestCheckups(pageable: Pageable): Page<CarCheckUp> {
+        return checkUpRepo.findAllByDatePerformedLessThanOrderByDatePerformedDesc(LocalDateTime.now(), pageable)
     }
 
     fun getAllCheckUpsForCarId(id: Long, pageable: Pageable): Page<CarCheckUp> =
@@ -48,7 +48,7 @@ class CarCheckUpService(
         )
     }
 
-    fun deleteCheckup(id:Long){
+    fun deleteCheckup(id: Long) {
         checkUpRepo.deleteById(id)
     }
 }

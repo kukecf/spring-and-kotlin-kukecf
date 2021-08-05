@@ -36,10 +36,13 @@ class CarInfoController(
     }
 
     @GetMapping("/{manufacturer}-{model}")
-    fun getModelWithId(@PathVariable manufacturer:String, @PathVariable model:String): ResponseEntity<CarInfoResource> {
+    fun getModelWithId(
+        @PathVariable manufacturer: String,
+        @PathVariable model: String
+    ): ResponseEntity<CarInfoResource> {
         return ResponseEntity.ok(
             resourceAssembler.toModel(
-                carInfoService.getModelWithId(manufacturer,model)
+                carInfoService.getModelWithId(manufacturer, model)
             )
         )
     }

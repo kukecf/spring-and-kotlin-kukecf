@@ -39,12 +39,12 @@ class CarService(
         return carRepo.findAll(pageable)
     }
 
-    fun getAllCarsForSameModel(manufacturer:String, model:String, pageable:Pageable) : Page<Car>{
-        return carRepo.findAllByInfoCarInfoPk(CarInfoPrimaryKey(manufacturer,model),pageable)
+    fun getAllCarsForSameModel(manufacturer: String, model: String, pageable: Pageable): Page<Car> {
+        return carRepo.findAllByInfoCarInfoPk(CarInfoPrimaryKey(manufacturer, model), pageable)
     }
 
     @Transactional
-    fun deleteCar(id:Long){
+    fun deleteCar(id: Long) {
         checkUpRepo.deleteAllByCarId(id)
         carRepo.deleteById(id)
     }

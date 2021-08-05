@@ -1,6 +1,5 @@
 package com.infinum.academy.cars.repository
 
-import com.infinum.academy.cars.domain.Car
 import com.infinum.academy.cars.domain.CarCheckUp
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -36,7 +35,7 @@ interface CarCheckUpRepository : Repository<CarCheckUp, Long> {
 
     fun deleteAll()
 
-    fun deleteAllByCarId(id:Long)
+    fun deleteAllByCarId(id: Long)
 
     fun deleteById(id: Long)
 }

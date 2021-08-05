@@ -1,11 +1,9 @@
 package com.infinum.academy.cars.repository
 
 import com.infinum.academy.cars.domain.Car
-import com.infinum.academy.cars.domain.CarInfo
 import com.infinum.academy.cars.domain.CarInfoPrimaryKey
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.Repository
 
 interface CarRepository : Repository<Car, Long> {

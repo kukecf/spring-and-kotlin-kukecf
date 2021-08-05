@@ -2,7 +2,6 @@ package com.infinum.academy.cars.controllers
 
 import com.infinum.academy.cars.controllers.assemblers.CarResourceAssembler
 import com.infinum.academy.cars.domain.Car
-import com.infinum.academy.cars.domain.CarCheckUp
 import com.infinum.academy.cars.dto.AddCarDto
 import com.infinum.academy.cars.resource.CarResource
 import com.infinum.academy.cars.services.CarService

@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 class ControllerAdvisor : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(NotFoundException::class)
-    fun handleNotFoundException(ex: CarNotFoundException, request: WebRequest): ResponseEntity<String> {
+    fun handleNotFoundException(ex: NotFoundException, request: WebRequest): ResponseEntity<String> {
         return ResponseEntity(ex.message, HttpStatus.NOT_FOUND)
     }
 }

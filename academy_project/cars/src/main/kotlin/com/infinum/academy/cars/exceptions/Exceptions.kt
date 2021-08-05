@@ -1,6 +1,6 @@
 package com.infinum.academy.cars.exceptions
 
-abstract class NotFoundException(message:String) : RuntimeException(message)
+abstract class NotFoundException(message: String) : RuntimeException(message)
 
 class CarNotFoundException(id: Long) : NotFoundException("Car with ID $id does not exist!")
 

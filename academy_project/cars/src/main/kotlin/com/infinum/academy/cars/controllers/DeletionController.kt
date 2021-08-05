@@ -15,12 +15,12 @@ class DeletionController(
     private val checkUpService: CarCheckUpService
 ) {
     @PostMapping("/car/{id}")
-    fun deleteCar(@PathVariable id:Long): ResponseEntity<Unit> {
+    fun deleteCar(@PathVariable id: Long): ResponseEntity<Unit> {
         return ResponseEntity.ok(carService.deleteCar(id))
     }
 
     @PostMapping("/checkup/{id}")
-    fun deleteCheckup(@PathVariable id:Long):ResponseEntity<Unit>{
+    fun deleteCheckup(@PathVariable id: Long): ResponseEntity<Unit> {
         return ResponseEntity.ok(checkUpService.deleteCheckup(id))
     }
 }
