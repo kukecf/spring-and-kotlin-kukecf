@@ -48,4 +48,10 @@ class CarService(
         checkUpRepo.deleteAllByCarId(id)
         carRepo.deleteById(id)
     }
+
+    @Transactional
+    fun deleteAll() {
+        checkUpRepo.deleteAll()
+        carRepo.deleteAll()
+    }
 }

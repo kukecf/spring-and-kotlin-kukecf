@@ -33,7 +33,7 @@ class JPATests @Autowired constructor(
     val checkupRepo: CarCheckUpRepository,
     val carInfoRepository: CarInfoRepository
 ) {
-    private var car_example_id: Long = 0
+    private var carExampleId: Long = 0
 
     @BeforeEach
     fun setUp() {
@@ -50,18 +50,12 @@ class JPATests @Autowired constructor(
         carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Peugeot", "305"), true))
         carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Dacia", "Sandero"), true))
         carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Opel", "Corsa"), true))
-
-
         val peugeot = AddCarDto(4, 2004, "72", "Peugeot", "305").toCar(infoFetcher)
         val dacia = AddCarDto(1, 2010, "4", "Dacia", "Sandero").toCar(infoFetcher)
         val renault = AddCarDto(4, 2012, "8", "Opel", "Corsa").toCar(infoFetcher)
-
-
         val cars = listOf(dacia, renault)
-
-        car_example_id = carRepo.save(peugeot).id
+        carExampleId = carRepo.save(peugeot).id
         carRepo.saveAll(cars)
-
         checkupRepo.saveAll(
             listOf(
                 AddCarCheckUpDto("Josip", 2f, peugeot.id, LocalDateTime.now()).toCarCheckUp(fetcher),
@@ -70,7 +64,6 @@ class JPATests @Autowired constructor(
                 AddCarCheckUpDto("Josip", 2f, dacia.id, LocalDateTime.now()).toCarCheckUp(fetcher)
             )
         )
-
         checkupRepo.saveAll(
             listOf(
                 AddCarCheckUpDto("Josip", 2f, peugeot.id, LocalDateTime.now().plus(Period.ofMonths(1))).toCarCheckUp(
@@ -128,15 +121,15 @@ class JPATests @Autowired constructor(
             productionYear = 1989,
             serialNumber = "800"
         )
-        val id = carRepo.save(car).id
+        carRepo.save(car).id
         val checkup = CarCheckUp(
             datePerformed = LocalDateTime.now(),
             workerName = "Mario",
             price = 20f,
             car = car
         )
-        val id_check = checkupRepo.save(checkup).id
-        assertThat(checkup).isEqualTo(checkupRepo.findById(id_check))
+        val idCheck = checkupRepo.save(checkup).id
+        assertThat(checkup).isEqualTo(checkupRepo.findById(idCheck))
     }
 
     @Test
@@ -148,25 +141,23 @@ class JPATests @Autowired constructor(
     @Test
     fun `can find all checkups for a car paged`() {
         val pageable = PageRequest.of(0, 2)
-        val checkups = checkupRepo.findAllByCarId(car_example_id, pageable)
+        val checkups = checkupRepo.findAllByCarId(carExampleId, pageable)
         assertThat(checkups.size).isEqualTo(2)
         assertThat(checkups.content[0].workerName).isEqualTo("Josip")
     }
 
     @Test
     fun `can find car by id only if exists`() {
-        val car = carRepo.findById(car_example_id)
+        val car = carRepo.findById(carExampleId)
         assertThat(car).isNotNull
         assertThat(car?.productionYear).isEqualTo(2004)
-
         val car2 = carRepo.findById(-2)
         assertThat(car2).isNull()
     }
 
     @Test
     fun `can find all checkups by car id`() {
-        val checkups = checkupRepo.findAllCheckupsForDetails(car_example_id)
+        val checkups = checkupRepo.findAllCheckupsForDetails(carExampleId)
         assertThat(checkups.size).isEqualTo(4)
     }
-
 }

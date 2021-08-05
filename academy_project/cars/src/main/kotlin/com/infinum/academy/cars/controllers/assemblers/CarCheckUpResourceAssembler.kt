@@ -25,5 +25,4 @@ class CarCheckUpResourceAssembler : RepresentationModelAssemblerSupport<CarCheck
     override fun instantiateModel(entity: CarCheckUp): CheckUpResource {
         return CheckUpResource(entity)
     }
-
 }

@@ -9,4 +9,4 @@ class CarCheckUpNotFoundException(id: Long) : NotFoundException("Checkup with ID
 class CarInfoNotFoundException(man: String, model: String) :
     NotFoundException("Car info for $man $model does not exist!")
 
-class NoModelsException() : NotFoundException("No models found on server!")
+class NoModelsException : NotFoundException("No models found on server!")

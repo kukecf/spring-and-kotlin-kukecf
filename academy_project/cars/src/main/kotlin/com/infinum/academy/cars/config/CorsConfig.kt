@@ -14,7 +14,6 @@ class CorsConfig {
         val corsConfiguration = CorsConfiguration().apply {
             allowedOriginPatterns = listOf("http://localhost:[*]")
         }
-
         val corsConfigSource = UrlBasedCorsConfigurationSource().apply {
             registerCorsConfiguration("/**", corsConfiguration)
         }

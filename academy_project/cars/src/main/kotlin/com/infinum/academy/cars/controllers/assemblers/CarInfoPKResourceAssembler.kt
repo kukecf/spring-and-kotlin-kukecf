@@ -19,5 +19,4 @@ class CarInfoPKResourceAssembler : RepresentationModelAssemblerSupport<CarInfo, 
     override fun instantiateModel(entity: CarInfo): CarInfoPKResource {
         return CarInfoPKResource(entity)
     }
-
 }

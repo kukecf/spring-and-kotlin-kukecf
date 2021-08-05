@@ -17,8 +17,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 @RequestMapping("/cars")
 class CarController(
     private val service: CarService,
-    private val resourceAssembler: CarResourceAssembler,
-
+    private val resourceAssembler: CarResourceAssembler
     ) {
 
     @GetMapping
@@ -33,7 +32,6 @@ class CarController(
             )
         )
     }
-
 
     @PostMapping
     fun addNewCar(@RequestBody carDto: AddCarDto): ResponseEntity<Unit> {
@@ -51,7 +49,6 @@ class CarController(
         return ResponseEntity.ok(resourceAssembler.toModel(service.getCar(id)))
     }
 
-    //ovdje bi moglo ici i preko parametara?
     @GetMapping("/model/{manufacturer}-{model}")
     fun allCarsWithModelInfo(
         @PathVariable manufacturer: String,
@@ -65,5 +62,4 @@ class CarController(
                 resourceAssembler
             )
         )
-
 }

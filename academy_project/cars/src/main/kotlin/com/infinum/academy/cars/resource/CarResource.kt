@@ -9,20 +9,13 @@ import java.time.LocalDate
 @Relation(collectionRelation = IanaLinkRelations.ITEM_VALUE)
 data class CarResource(
     val id: Long = 0,
-
     val ownerId: Long,
-
     val dateAdded: LocalDate,
-
     val manufacturerName: String,
-
     val modelName: String,
-
     val productionYear: Int,
-
     val serialNumber: String,
-
-    ) : RepresentationModel<CarResource>() {
+) : RepresentationModel<CarResource>() {
     constructor(car: Car) : this(
         car.id,
         car.ownerId,

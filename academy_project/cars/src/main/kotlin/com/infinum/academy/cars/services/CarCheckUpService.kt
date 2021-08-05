@@ -11,6 +11,7 @@ import com.infinum.academy.cars.repository.CarRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
@@ -48,7 +49,13 @@ class CarCheckUpService(
         )
     }
 
+    @Transactional
     fun deleteCheckup(id: Long) {
         checkUpRepo.deleteById(id)
+    }
+
+    @Transactional
+    fun deleteAll() {
+        checkUpRepo.deleteAll()
     }
 }

@@ -35,5 +35,4 @@ class CarInfoResourceAssembler : RepresentationModelAssemblerSupport<CarInfo, Ca
     override fun instantiateModel(entity: CarInfo): CarInfoResource {
         return CarInfoResource(entity)
     }
-
 }
