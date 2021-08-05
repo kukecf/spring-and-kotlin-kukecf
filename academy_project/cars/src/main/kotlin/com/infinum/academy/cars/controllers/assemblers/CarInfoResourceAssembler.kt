@@ -17,7 +17,7 @@ class CarInfoResourceAssembler : RepresentationModelAssemblerSupport<CarInfo, Ca
 ) {
     override fun toModel(entity: CarInfo): CarInfoResource {
         entity.carInfoPk.let {
-            return createModelWithId("${it.manufacturer}${it.modelName}", entity).apply {
+            return createModelWithId("${it.manufacturer}-${it.modelName}", entity).apply {
                 add(
                     linkTo<CarController> {
                         allCarsWithModelInfo(

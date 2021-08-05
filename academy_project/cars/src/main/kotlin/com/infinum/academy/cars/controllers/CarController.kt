@@ -52,7 +52,8 @@ class CarController(
         return ResponseEntity.ok(resourceAssembler.toModel(service.getCar(id)))
     }
 
-    @GetMapping("/{manufacturer}{model}")
+    //ovdje bi moglo ici i preko parametara?
+    @GetMapping("/model/{manufacturer}-{model}")
     fun allCarsWithModelInfo(
         @PathVariable manufacturer: String,
         @PathVariable model: String,
