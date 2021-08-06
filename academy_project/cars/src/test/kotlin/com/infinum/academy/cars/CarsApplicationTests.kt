@@ -17,6 +17,7 @@ import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.annotation.Rollback
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -379,7 +380,7 @@ class CarsApplicationTests @Autowired constructor(
             )
         }
 
-        mvc.post("/delete/car/{id}", idcar).andExpect {
+        mvc.delete("/cars/{id}", idcar).andExpect {
             status { isOk() }
         }
 
@@ -427,7 +428,7 @@ class CarsApplicationTests @Autowired constructor(
             result.response.getHeaderValue("Location").toStr()
                 .removePrefix("http://localhost/checkups/").toLong()
 
-        mvc.post("/delete/checkup/{id}", idCheckup).andExpect {
+        mvc.delete("/checkups/{id}", idCheckup).andExpect {
             status { isOk() }
         }
 
@@ -441,7 +442,7 @@ class CarsApplicationTests @Autowired constructor(
     @Transactional
     @WithMockUser(authorities = ["SCOPE_ADMIN"])
     fun test13() {
-        mvc.get("/models").andExpect {
+        mvc.get("/cars/models").andExpect {
             status { is2xxSuccessful() }
             jsonPath("$._embedded.item") {
                 isArray()
@@ -657,7 +658,7 @@ class CarsApplicationTests @Autowired constructor(
         val idcar = resultCar.response.getHeaderValue("Location").toStr()
             .removePrefix("http://localhost/cars/")
 
-        mvc.post("/delete/car/{id}", idcar).andExpect {
+        mvc.delete("/cars/{id}", idcar).andExpect {
             status { isForbidden() }
         }
     }
@@ -667,7 +668,7 @@ class CarsApplicationTests @Autowired constructor(
     @Transactional
     @WithMockUser(authorities = ["SCOPE_USER"])
     fun test25() {
-        mvc.post("/delete/checkup/{id}", 1).andExpect {
+        mvc.delete("/checkups/{id}", 1).andExpect {
             status { isForbidden() }
         }
     }
@@ -677,7 +678,7 @@ class CarsApplicationTests @Autowired constructor(
     @Transactional
     @WithMockUser(authorities = ["SCOPE_USER"])
     fun test26() {
-        mvc.get("/models").andExpect {
+        mvc.get("/cars/models").andExpect {
             status { is2xxSuccessful() }
             jsonPath("$._embedded.item") {
                 isArray()
@@ -790,7 +791,7 @@ class CarsApplicationTests @Autowired constructor(
     @Transactional
     @WithAnonymousUser
     fun test36() {
-        mvc.post("/delete/car/{id}", 1).andExpect {
+        mvc.delete("/cars/{id}", 1).andExpect {
             status { isUnauthorized() }
         }
     }
@@ -800,7 +801,7 @@ class CarsApplicationTests @Autowired constructor(
     @Transactional
     @WithAnonymousUser
     fun test37() {
-        mvc.post("/delete/checkup/{id}", 1).andExpect {
+        mvc.delete("/checkups/{id}", 1).andExpect {
             status { isUnauthorized() }
         }
     }
@@ -810,7 +811,7 @@ class CarsApplicationTests @Autowired constructor(
     @Transactional
     @WithAnonymousUser
     fun test38() {
-        mvc.get("/models").andExpect { status { is2xxSuccessful() } }
+        mvc.get("/cars/models").andExpect { status { is2xxSuccessful() } }
     }
 
 }

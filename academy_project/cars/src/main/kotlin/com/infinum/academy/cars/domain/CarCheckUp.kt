@@ -19,6 +19,6 @@ data class CarCheckUp(
 
     val price: Float,
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = [CascadeType.REMOVE])
     val car: Car
 )

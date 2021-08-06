@@ -1,12 +1,12 @@
 package com.infinum.academy.cars.services
 
 import com.infinum.academy.cars.domain.Car
+import com.infinum.academy.cars.domain.CarInfo
 import com.infinum.academy.cars.domain.CarInfoPrimaryKey
 import com.infinum.academy.cars.dto.AddCarDto
 import com.infinum.academy.cars.dto.toCar
 import com.infinum.academy.cars.exceptions.CarInfoNotFoundException
 import com.infinum.academy.cars.exceptions.CarNotFoundException
-import com.infinum.academy.cars.repository.CarCheckUpRepository
 import com.infinum.academy.cars.repository.CarInfoRepository
 import com.infinum.academy.cars.repository.CarRepository
 import org.springframework.data.domain.Page
@@ -17,7 +17,6 @@ import javax.transaction.Transactional
 @Service
 class CarService(
     private val carRepo: CarRepository,
-    private val checkUpRepo: CarCheckUpRepository,
     private val carInfoRepo: CarInfoRepository
 ) {
     fun addCar(carDto: AddCarDto): Long {
@@ -39,19 +38,19 @@ class CarService(
         return carRepo.findAll(pageable)
     }
 
-    fun getAllCarsForSameModel(manufacturer: String, model: String, pageable: Pageable): Page<Car> {
-        return carRepo.findAllByInfoCarInfoPk(CarInfoPrimaryKey(manufacturer, model), pageable)
-    }
-
     @Transactional
     fun deleteCar(id: Long) {
-        checkUpRepo.deleteAllByCarId(id)
         carRepo.deleteById(id)
     }
 
     @Transactional
     fun deleteAll() {
-        checkUpRepo.deleteAll()
         carRepo.deleteAll()
     }
+
+    fun getAllAvailableModels(pageable: Pageable): Page<CarInfo> {
+        return carRepo.findAllDistinctByInfo(pageable)
+    }
+
+    fun existsCar(carId: Long) = carRepo.findById(carId) != null
 }

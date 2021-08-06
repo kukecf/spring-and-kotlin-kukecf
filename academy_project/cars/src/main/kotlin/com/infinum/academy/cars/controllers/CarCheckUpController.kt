@@ -2,8 +2,10 @@ package com.infinum.academy.cars.controllers
 
 import com.infinum.academy.cars.controllers.assemblers.CarCheckUpResourceAssembler
 import com.infinum.academy.cars.domain.CarCheckUp
+import com.infinum.academy.cars.exceptions.CarNotFoundException
 import com.infinum.academy.cars.resource.CheckUpResource
 import com.infinum.academy.cars.services.CarCheckUpService
+import com.infinum.academy.cars.services.CarService
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PagedResourcesAssembler
 import org.springframework.hateoas.PagedModel
@@ -16,7 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 @Controller
 @RequestMapping("/cars/{carId}/checkups")
 class CarCheckUpController(
-    private val service: CarCheckUpService,
+    private val checkupService: CarCheckUpService,
+    private val carService : CarService,
     private val resourceAssembler: CarCheckUpResourceAssembler
 ) {
     @GetMapping
@@ -24,11 +27,15 @@ class CarCheckUpController(
         @PathVariable carId: Long,
         pageable: Pageable,
         pagedResourcesAssembler: PagedResourcesAssembler<CarCheckUp>
-    ): ResponseEntity<PagedModel<CheckUpResource>> =
-        ResponseEntity.ok(
+    ): ResponseEntity<PagedModel<CheckUpResource>> {
+        if(carService.existsCar(carId).not()) { // mogao sam tu i samo pozvati funkciju getCar(), ali ovo se ljepse cita
+            throw CarNotFoundException(carId)
+        }
+        return ResponseEntity.ok(
             pagedResourcesAssembler.toModel(
-                service.getAllCheckUpsForCarId(carId, pageable),
+                checkupService.getAllCheckUpsForCarId(carId, pageable),
                 resourceAssembler
             )
         )
+    }
 }

@@ -1,8 +1,11 @@
 package com.infinum.academy.cars.controllers
 
+import com.infinum.academy.cars.controllers.assemblers.CarModelInfoResourceAssembler
 import com.infinum.academy.cars.controllers.assemblers.CarResourceAssembler
 import com.infinum.academy.cars.domain.Car
+import com.infinum.academy.cars.domain.CarInfo
 import com.infinum.academy.cars.dto.AddCarDto
+import com.infinum.academy.cars.resource.CarModelInfoResource
 import com.infinum.academy.cars.resource.CarResource
 import com.infinum.academy.cars.services.CarService
 import org.springframework.data.domain.Pageable
@@ -17,8 +20,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 @RequestMapping("/cars")
 class CarController(
     private val service: CarService,
-    private val resourceAssembler: CarResourceAssembler
-    ) {
+    private val resourceAssembler: CarResourceAssembler,
+    private val carModelInfoResourceAssembler: CarModelInfoResourceAssembler
+) {
 
     @GetMapping
     fun getAllCars(
@@ -49,17 +53,21 @@ class CarController(
         return ResponseEntity.ok(resourceAssembler.toModel(service.getCar(id)))
     }
 
-    @GetMapping("/model/{manufacturer}-{model}")
-    fun allCarsWithModelInfo(
-        @PathVariable manufacturer: String,
-        @PathVariable model: String,
+    @DeleteMapping("/{id}")
+    fun deleteCar(@PathVariable id: Long): ResponseEntity<Unit> {
+        return ResponseEntity.ok(service.deleteCar(id))
+    }
+
+    @GetMapping("/models")
+    fun getAvailableModels(
         pageable: Pageable,
-        pagedResourcesAssembler: PagedResourcesAssembler<Car>
-    ): ResponseEntity<PagedModel<CarResource>> =
-        ResponseEntity.ok(
+        pagedResourcesAssembler: PagedResourcesAssembler<CarInfo>
+    ): ResponseEntity<PagedModel<CarModelInfoResource>> {
+        return ResponseEntity.ok(
             pagedResourcesAssembler.toModel(
-                service.getAllCarsForSameModel(manufacturer, model, pageable),
-                resourceAssembler
+                service.getAllAvailableModels(pageable),
+                carModelInfoResourceAssembler
             )
         )
+    }
 }
