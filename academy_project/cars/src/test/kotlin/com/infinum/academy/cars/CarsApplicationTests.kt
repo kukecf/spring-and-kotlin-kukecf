@@ -80,13 +80,6 @@ class CarsApplicationTests @Autowired constructor(
         }
     }
 
-    @AfterAll
-    fun shutDown() {
-        checkUpService.deleteAll()
-        carService.deleteAll()
-        infoService.deleteModels()
-    }
-
     @Test
     @DisplayName("should return all cars")
     @Transactional
@@ -355,8 +348,6 @@ class CarsApplicationTests @Autowired constructor(
         val idcar = resultCar.response.getHeaderValue("Location").toStr()
             .removePrefix("http://localhost/cars/")
 
-        val ids = mutableListOf<Long>()
-
         val checkupDtos = listOf(
             AddCarCheckUpDto("Josip", 2f, idcar.toLong(), LocalDateTime.now().plus(Period.ofMonths(1))),
             AddCarCheckUpDto("Marko", 2f, idcar.toLong(), LocalDateTime.now().plus(Period.ofMonths(1))),
@@ -365,19 +356,14 @@ class CarsApplicationTests @Autowired constructor(
         )
 
         checkupDtos.forEach {
-            val result = mvc.post("/checkups") {
+            mvc.post("/checkups") {
                 contentType = MediaType.APPLICATION_JSON
                 content = mapper.writeValueAsString(it)
                 accept = MediaType.APPLICATION_JSON
             }.andExpect {
                 status { is2xxSuccessful() }
                 header { exists("Location") }
-            }.andReturn()
-
-            ids.add(
-                result.response.getHeaderValue("Location").toStr()
-                    .removePrefix("http://localhost/checkups/").toLong()
-            )
+            }
         }
 
         mvc.delete("/cars/{id}", idcar).andExpect {
@@ -388,10 +374,8 @@ class CarsApplicationTests @Autowired constructor(
             status { isNotFound() }
         }
 
-        ids.forEach {
-            mvc.get("/checkups/{id}", it).andExpect {
-                status { isNotFound() }
-            }
+        mvc.get("/cars/{id}/checkups", idcar).andExpect {
+            status { isNotFound() }
         }
     }
 
