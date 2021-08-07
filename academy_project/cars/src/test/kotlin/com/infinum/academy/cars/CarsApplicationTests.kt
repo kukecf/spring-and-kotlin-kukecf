@@ -29,7 +29,6 @@ import java.time.Period
 @SpringBootTest
 @AutoConfigureMockMvc
 @Rollback
-@ActiveProfiles(profiles = ["test"])
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CarsApplicationTests @Autowired constructor(
     private val mvc: MockMvc,
@@ -39,12 +38,10 @@ class CarsApplicationTests @Autowired constructor(
     private val checkUpService: CarCheckUpService
 ) {
 
+    private val ids = mutableListOf<Long>()
     @BeforeAll
     @WithMockUser(authorities = ["SCOPE_ADMIN"])
     fun setUp() {
-        checkUpService.deleteAll()
-        carService.deleteAll()
-        infoService.deleteModels()
 
         infoService.saveModelsFromServer()
 
@@ -55,29 +52,36 @@ class CarsApplicationTests @Autowired constructor(
             AddCarDto(1, 2004, "8921", "Ferrari", "California")
         )
 
-        val checkups = listOf(
-            AddCarCheckUpDto("Josip", 2f, 1, LocalDateTime.now().minus(Period.ofDays(2))),
-            AddCarCheckUpDto("Josip", 2f, 2, LocalDateTime.now().minus(Period.ofDays(2))),
-            AddCarCheckUpDto("Josip", 2f, 1, LocalDateTime.now().minus(Period.ofDays(2))),
-            AddCarCheckUpDto("Josip", 2f, 3, LocalDateTime.now()),
-            AddCarCheckUpDto("Stef", 2f, 3, LocalDateTime.now()),
-            AddCarCheckUpDto("Josip", 2f, 1, LocalDateTime.now().minus(Period.ofDays(2))),
-            AddCarCheckUpDto("Marko", 2f, 1, LocalDateTime.now().minus(Period.ofDays(2))),
-            AddCarCheckUpDto("Ivan", 2f, 1, LocalDateTime.now().minus(Period.ofDays(2))),
-            AddCarCheckUpDto("Hrvoje", 2f, 2, LocalDateTime.now().minus(Period.ofDays(2))),
-            AddCarCheckUpDto("Josip", 2f, 4, LocalDateTime.now().plus(Period.ofMonths(1))),
-            AddCarCheckUpDto("Marko", 2f, 4, LocalDateTime.now().plus(Period.ofMonths(1))),
-            AddCarCheckUpDto("Ivan", 2f, 4, LocalDateTime.now().plus(Period.ofMonths(1))),
-            AddCarCheckUpDto("Hrvoje", 2f, 4, LocalDateTime.now().plus(Period.ofMonths(1)))
-        )
-
         cars.forEach {
-            carService.addCar(it)
+            ids.add(carService.addCar(it))
         }
+
+        val checkups = listOf(
+            AddCarCheckUpDto("Josip", 2f, ids[0], LocalDateTime.now().minus(Period.ofDays(2))),
+            AddCarCheckUpDto("Josip", 2f, ids[1], LocalDateTime.now().minus(Period.ofDays(2))),
+            AddCarCheckUpDto("Josip", 2f, ids[2], LocalDateTime.now().minus(Period.ofDays(2))),
+            AddCarCheckUpDto("Josip", 2f, ids[2], LocalDateTime.now()),
+            AddCarCheckUpDto("Stef", 2f, ids[2], LocalDateTime.now()),
+            AddCarCheckUpDto("Josip", 2f, ids[0], LocalDateTime.now().minus(Period.ofDays(2))),
+            AddCarCheckUpDto("Marko", 2f, ids[0], LocalDateTime.now().minus(Period.ofDays(2))),
+            AddCarCheckUpDto("Ivan", 2f, ids[0], LocalDateTime.now().minus(Period.ofDays(2))),
+            AddCarCheckUpDto("Hrvoje", 2f, ids[1], LocalDateTime.now().minus(Period.ofDays(2))),
+            AddCarCheckUpDto("Josip", 2f, ids[3], LocalDateTime.now().plus(Period.ofMonths(1))),
+            AddCarCheckUpDto("Marko", 2f, ids[3], LocalDateTime.now().plus(Period.ofMonths(1))),
+            AddCarCheckUpDto("Ivan", 2f, ids[3], LocalDateTime.now().plus(Period.ofMonths(1))),
+            AddCarCheckUpDto("Hrvoje", 2f, ids[3], LocalDateTime.now().plus(Period.ofMonths(1)))
+        )
 
         checkups.forEach {
             checkUpService.addCarCheckUp(it)
         }
+    }
+
+    @AfterAll
+    fun tearDown(){
+        checkUpService.deleteAll()
+        carService.deleteAll()
+        infoService.deleteModels()
     }
 
     @Test
@@ -245,7 +249,7 @@ class CarsApplicationTests @Autowired constructor(
     @Transactional
     @WithMockUser(authorities = ["SCOPE_ADMIN"])
     fun test6() {
-        mvc.get("/cars/{id}/checkups", 3).andExpect {
+        mvc.get("/cars/{id}/checkups", ids[2]).andExpect {
             status { is2xxSuccessful() }
             jsonPath("$._embedded.item") {
                 isArray()

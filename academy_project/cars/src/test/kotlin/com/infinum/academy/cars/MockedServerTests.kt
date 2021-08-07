@@ -20,7 +20,6 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper
 @SpringBootTest
 @MockServerTest
 @PropertySource("classpath:mockserver.properties")
-@ActiveProfiles(profiles = ["test"])
 class MockedServerTest @Autowired constructor(
     private val mvc: MockMvc,
     private val mapper: ObjectMapper

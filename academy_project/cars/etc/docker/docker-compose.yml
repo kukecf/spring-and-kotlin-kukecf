@@ -3,6 +3,14 @@ version: "3"
 # docker run --rm --name car-database -v car-db-data:/var/lib/postgresql/data -p 2345:5432
 # -e POSTGRES_PASSWORD=admin -e POSTGRES_DB=courses-db -d postgres:13-alpine
 services:
+  app:
+    image: "academy/buildpack-image:latest"
+    ports:
+      - "8080:8080"
+    environment:
+      - "SPRING_DATASOURCE_URL=jdbc:postgresql://car-database:5432/car-db"
+    depends_on:
+      - car-database
   car-database:
     image: "postgres:13-alpine"
     ports:

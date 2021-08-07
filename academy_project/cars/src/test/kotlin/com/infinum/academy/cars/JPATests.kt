@@ -14,23 +14,22 @@ import com.infinum.academy.cars.repository.CarCheckUpRepository
 import com.infinum.academy.cars.repository.CarInfoRepository
 import com.infinum.academy.cars.repository.CarRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.data.domain.PageRequest
+import org.springframework.test.annotation.Rollback
 import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Period
+import javax.transaction.Transactional
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ActiveProfiles(profiles = ["test"])
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Rollback
 class JPATests @Autowired constructor(
     val carRepo: CarRepository,
     val checkupRepo: CarCheckUpRepository,
@@ -97,6 +96,7 @@ class JPATests @Autowired constructor(
     }
 
     @Test
+    @Transactional
     fun `can add a car and find it`() {
         val car = Car(
             ownerId = 2,
@@ -111,6 +111,7 @@ class JPATests @Autowired constructor(
     }
 
     @Test
+    @Transactional
     fun `can add a checkup and find it`() {
         carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Zastava", "102"), true))
         val car = Car(
