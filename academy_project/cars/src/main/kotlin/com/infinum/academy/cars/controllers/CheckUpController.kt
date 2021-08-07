@@ -66,4 +66,9 @@ class CheckUpController(
             )
         )
     }
+
+    @DeleteMapping("/{id}")
+    fun deleteCheckup(@PathVariable id: Long): ResponseEntity<Unit> {
+        return ResponseEntity.ok(service.deleteCheckup(id))
+    }
 }

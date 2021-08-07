@@ -19,6 +19,6 @@ data class Car(
 
     val serialNumber: String,
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = [CascadeType.REMOVE])
     val info: CarInfo
 )

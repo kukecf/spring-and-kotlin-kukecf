@@ -14,8 +14,10 @@ import com.infinum.academy.cars.repository.CarCheckUpRepository
 import com.infinum.academy.cars.repository.CarInfoRepository
 import com.infinum.academy.cars.repository.CarRepository
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -28,6 +30,7 @@ import java.time.Period
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles(profiles = ["test"])
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class JPATests @Autowired constructor(
     val carRepo: CarRepository,
     val checkupRepo: CarCheckUpRepository,
@@ -35,7 +38,7 @@ class JPATests @Autowired constructor(
 ) {
     private var carExampleId: Long = 0
 
-    @BeforeEach
+    @BeforeAll
     fun setUp() {
         val infoFetcher: (String, String) -> CarInfo = { man, model ->
             carInfoRepository.findByCarInfoPk(CarInfoPrimaryKey(man, model)) ?: throw CarInfoNotFoundException(
@@ -43,9 +46,6 @@ class JPATests @Autowired constructor(
                 model
             )
         }
-        carRepo.deleteAll()
-        checkupRepo.deleteAll()
-        carInfoRepository.deleteAll()
         val fetcher = { id: Long -> carRepo.findById(id) ?: throw CarNotFoundException(id) }
         carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Peugeot", "305"), true))
         carInfoRepository.save(CarInfo(CarInfoPrimaryKey("Dacia", "Sandero"), true))

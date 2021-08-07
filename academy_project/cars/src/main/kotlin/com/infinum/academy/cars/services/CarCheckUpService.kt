@@ -31,11 +31,12 @@ class CarCheckUpService(
         return checkUpRepo.findAllByDatePerformedLessThanOrderByDatePerformedDesc(LocalDateTime.now(), pageable)
     }
 
-    fun getAllCheckUpsForCarId(id: Long, pageable: Pageable): Page<CarCheckUp> =
-        checkUpRepo.findAllByCarId(
+    fun getAllCheckUpsForCarId(id: Long, pageable: Pageable): Page<CarCheckUp> {
+        return checkUpRepo.findAllByCarId(
             id,
             pageable
         )
+    }
 
     fun getCheckUp(id: Long): CarCheckUp {
         return checkUpRepo.findById(id) ?: throw CarCheckUpNotFoundException(id)

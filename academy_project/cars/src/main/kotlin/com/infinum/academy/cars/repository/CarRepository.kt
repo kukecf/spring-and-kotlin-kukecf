@@ -1,9 +1,10 @@
 package com.infinum.academy.cars.repository
 
 import com.infinum.academy.cars.domain.Car
-import com.infinum.academy.cars.domain.CarInfoPrimaryKey
+import com.infinum.academy.cars.domain.CarInfo
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.Repository
 
 interface CarRepository : Repository<Car, Long> {
@@ -18,7 +19,8 @@ interface CarRepository : Repository<Car, Long> {
 
     fun findAll(): List<Car>
 
-    fun findAllByInfoCarInfoPk(infoPk: CarInfoPrimaryKey, pageable: Pageable): Page<Car>
+    @Query("select distinct car.info from Car car")
+    fun findAllDistinctByInfo(pageable: Pageable): Page<CarInfo>
 
     fun deleteAll()
 
