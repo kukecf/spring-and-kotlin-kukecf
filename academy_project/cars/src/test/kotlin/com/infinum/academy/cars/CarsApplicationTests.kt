@@ -79,9 +79,9 @@ class CarsApplicationTests @Autowired constructor(
 
     @AfterAll
     fun tearDown(){
-        checkUpService.deleteAll()
-        carService.deleteAll()
-        infoService.deleteModels()
+        //checkUpService.deleteAll()
+        //carService.deleteAll()
+        //infoService.deleteModels()
     }
 
     @Test

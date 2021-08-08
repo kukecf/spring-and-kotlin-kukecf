@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    id("org.unbroken-dome.test-sets") version "4.0.0"
     id("org.springframework.boot") version "2.5.2"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     kotlin("jvm") version "1.5.20"
@@ -110,3 +111,9 @@ tasks.jacocoTestReport {
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootBuildImage> {
     imageName = "academy/buildpack-image"
 }
+
+testSets {
+    //integrationTest {extendsFrom test}
+}
+
+//check.dependsOn integrationTest
