@@ -110,7 +110,7 @@ complexity:
   LongMethod:
     active: true
     threshold: 60
-    ignoreAnnotated: []
+   # ignoreAnnotated: []
   LongParameterList:
     active: true
     functionThreshold: 6
@@ -401,10 +401,6 @@ formatting:
 
 naming:
   active: true
-  BooleanPropertyNaming:
-    active: false
-    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**']
-    allowedPattern: '^(is|has|are)'
   ClassNaming:
     active: true
     excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**']
@@ -508,10 +504,6 @@ performance:
 
 potential-bugs:
   active: true
-  AvoidReferentialEquality:
-    active: false
-    forbiddenTypePatterns:
-      - 'kotlin.String'
   CastToNullableType:
     active: false
   Deprecation:
@@ -538,8 +530,6 @@ potential-bugs:
     returnValueAnnotations:
       - '*.CheckReturnValue'
       - '*.CheckResult'
-    ignoreReturnValueAnnotations:
-      - '*.CanIgnoreReturnValue'
   ImplicitDefaultLocale:
     active: true
   ImplicitUnitReturnType:
@@ -727,7 +717,6 @@ style:
   ThrowsCount:
     active: true
     max: 2
-    excludeGuardClauses: false
   TrailingWhitespace:
     active: false
   UnderscoresInNumericLiterals:

@@ -4,6 +4,7 @@ import com.infinum.academy.cars.domain.CarInfo
 import com.infinum.academy.cars.domain.CarInfoPrimaryKey
 import com.infinum.academy.cars.exceptions.NoModelsException
 import com.infinum.academy.cars.repository.CarInfoRepository
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -13,6 +14,7 @@ class CarInfoAdministrationService(
     private val service: CarInfoService,
     private val infoRepository: CarInfoRepository
 ) {
+    @CacheEvict("model-info",allEntries=true)
     fun saveModelsFromServer() {
         infoRepository.saveAll(service.getModelsFromServer()?.filter {
             infoRepository.existsCarInfoByCarInfoPk(
@@ -23,10 +25,6 @@ class CarInfoAdministrationService(
 
     fun deleteModels() {
         infoRepository.deleteAll()
-    }
-
-    fun getAllModelsInShop(pageable: Pageable): Page<CarInfo> {
-        return infoRepository.findModelsWhichExistInShop(pageable)
     }
 
     fun getModelWithId(manufacturer: String, model: String): CarInfo {

@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.Repository
 import java.time.LocalDateTime
 
-
 interface CarCheckUpRepository : Repository<CarCheckUp, Long> {
     fun save(checkup: CarCheckUp): CarCheckUp
 
@@ -34,8 +33,6 @@ interface CarCheckUpRepository : Repository<CarCheckUp, Long> {
     ): Page<CarCheckUp>
 
     fun deleteAll()
-
-    fun deleteAllByCarId(id: Long)
 
     fun deleteById(id: Long)
 }

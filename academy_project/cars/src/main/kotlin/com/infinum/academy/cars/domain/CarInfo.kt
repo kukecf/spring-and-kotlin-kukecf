@@ -1,10 +1,12 @@
 package com.infinum.academy.cars.domain
 
+import org.springframework.data.redis.core.RedisHash
 import java.io.Serializable
 import javax.persistence.*
 
 @Entity
 @Table(name = "carmodels")
+//@RedisHash
 data class CarInfo(
 
     @EmbeddedId
@@ -13,7 +15,7 @@ data class CarInfo(
     @Column(name = "is_common")
     val isCommon: Boolean
 
-)
+):Serializable
 
 @Embeddable
 data class CarInfoPrimaryKey(

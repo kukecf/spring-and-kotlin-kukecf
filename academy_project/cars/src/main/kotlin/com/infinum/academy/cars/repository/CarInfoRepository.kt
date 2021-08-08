@@ -2,6 +2,8 @@ package com.infinum.academy.cars.repository
 
 import com.infinum.academy.cars.domain.CarInfo
 import com.infinum.academy.cars.domain.CarInfoPrimaryKey
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
@@ -13,12 +15,11 @@ interface CarInfoRepository : Repository<CarInfo, CarInfoPrimaryKey> {
 
     fun save(carInfo: CarInfo): CarInfo
 
+    @Cacheable("model-info")
     fun findByCarInfoPk(carInfoPrimaryKey: CarInfoPrimaryKey): CarInfo?
-
-    @Query("select distinct model from CarInfo model join fetch Car car on car.info.carInfoPk = model.carInfoPk")
-    fun findModelsWhichExistInShop(pageable: Pageable): Page<CarInfo>
 
     fun saveAll(carInfos: Iterable<CarInfo>): Iterable<CarInfo>
 
+    @CacheEvict("model-info",allEntries=true)
     fun deleteAll()
 }
