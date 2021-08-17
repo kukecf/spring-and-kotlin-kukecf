@@ -6,13 +6,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
-import java.time.LocalDateTime
 
 @ControllerAdvice
 class ControllerAdvisor : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(NotFoundException::class)
-    fun handleNotFoundException(ex : CarNotFoundException, request : WebRequest): ResponseEntity<String> {
-       return ResponseEntity(ex.message,HttpStatus.NOT_FOUND)
+    fun handleNotFoundException(ex: NotFoundException, request: WebRequest): ResponseEntity<String> {
+        return ResponseEntity(ex.message, HttpStatus.NOT_FOUND)
     }
 }

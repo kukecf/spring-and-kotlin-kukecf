@@ -17,4 +17,3 @@ fun AddCarCheckUpDto.toCarCheckUp(carFetcher: (Long) -> Car) = CarCheckUp(
     price = price,
     car = carFetcher.invoke(this.carId)
 )
-

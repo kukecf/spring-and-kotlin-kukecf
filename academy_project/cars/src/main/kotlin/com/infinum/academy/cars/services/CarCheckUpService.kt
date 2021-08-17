@@ -11,6 +11,7 @@ import com.infinum.academy.cars.repository.CarRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
@@ -26,26 +27,39 @@ class CarCheckUpService(
         return checkUpRepo.save(checkUp).id
     }
 
-    fun getLatestCheckups(pageable:Pageable): Page<CarCheckUp> {
-        return checkUpRepo.findAllByDatePerformedLessThanOrderByDatePerformedDesc(LocalDateTime.now(),pageable)
+    fun getLatestCheckups(pageable: Pageable): Page<CarCheckUp> {
+        return checkUpRepo.findAllByDatePerformedLessThanOrderByDatePerformedDesc(LocalDateTime.now(), pageable)
     }
 
-    fun getAllCheckUpsForCarId(id: Long, pageable: Pageable): Page<CarCheckUp> =
-        checkUpRepo.findAllByCarId(
+    fun getAllCheckUpsForCarId(id: Long, pageable: Pageable): Page<CarCheckUp> {
+        if (carRepo.findById(id) == null) {
+            throw CarNotFoundException(id)
+        }
+        return checkUpRepo.findAllByCarId(
             id,
             pageable
         )
+    }
 
     fun getCheckUp(id: Long): CarCheckUp {
         return checkUpRepo.findById(id) ?: throw CarCheckUpNotFoundException(id)
     }
 
     fun getUpcomingCheckupsInInterval(duration: Duration, pageable: Pageable): Page<CarCheckUp> {
-        return checkUpRepo.findByDatePerformedBetween(
+        return checkUpRepo.findByDatePerformedBetweenOrderByDatePerformed(
             LocalDateTime.now(),
             LocalDateTime.now().plus(duration.toPeriod()),
             pageable
         )
     }
 
+    @Transactional
+    fun deleteCheckup(id: Long) {
+        checkUpRepo.deleteById(id)
+    }
+
+    @Transactional
+    fun deleteAll() {
+        checkUpRepo.deleteAll()
+    }
 }

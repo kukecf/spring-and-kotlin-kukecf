@@ -1,22 +1,22 @@
 package com.infinum.academy.cars.services
 
 import com.infinum.academy.cars.domain.Car
+import com.infinum.academy.cars.domain.CarInfo
 import com.infinum.academy.cars.domain.CarInfoPrimaryKey
 import com.infinum.academy.cars.dto.AddCarDto
 import com.infinum.academy.cars.dto.toCar
 import com.infinum.academy.cars.exceptions.CarInfoNotFoundException
 import com.infinum.academy.cars.exceptions.CarNotFoundException
-import com.infinum.academy.cars.repository.CarCheckUpRepository
 import com.infinum.academy.cars.repository.CarInfoRepository
 import com.infinum.academy.cars.repository.CarRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import javax.transaction.Transactional
 
 @Service
 class CarService(
     private val carRepo: CarRepository,
-    private val checkUpRepo: CarCheckUpRepository,
     private val carInfoRepo: CarInfoRepository
 ) {
     fun addCar(carDto: AddCarDto): Long {
@@ -37,4 +37,20 @@ class CarService(
     fun getAllCars(pageable: Pageable): Page<Car> {
         return carRepo.findAll(pageable)
     }
+
+    @Transactional
+    fun deleteCar(id: Long) {
+        carRepo.deleteById(id)
+    }
+
+    @Transactional
+    fun deleteAll() {
+        carRepo.deleteAll()
+    }
+
+    fun getAllAvailableModels(pageable: Pageable): Page<CarInfo> {
+        return carRepo.findAllDistinctByInfo(pageable)
+    }
+
+    fun existsCar(carId: Long) = carRepo.findById(carId) != null
 }

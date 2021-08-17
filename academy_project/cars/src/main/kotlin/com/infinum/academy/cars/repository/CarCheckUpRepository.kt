@@ -5,9 +5,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.Repository
-import org.springframework.data.repository.query.Param
 import java.time.LocalDateTime
-
 
 interface CarCheckUpRepository : Repository<CarCheckUp, Long> {
     fun save(checkup: CarCheckUp): CarCheckUp
@@ -18,18 +16,23 @@ interface CarCheckUpRepository : Repository<CarCheckUp, Long> {
 
     fun findAll(): List<CarCheckUp>
 
-    fun findAllByDatePerformedLessThanOrderByDatePerformedDesc(date:LocalDateTime,pageable:Pageable): Page<CarCheckUp>
+    fun findAllByDatePerformedLessThanOrderByDatePerformedDesc(
+        date: LocalDateTime,
+        pageable: Pageable
+    ): Page<CarCheckUp>
 
     @Query("select check from CarCheckUp check join fetch Car car on car.id=check.car.id where check.car.id = :carId order by check.datePerformed desc")
     fun findAllCheckupsForDetails(carId: Long): List<CarCheckUp>
 
     fun findAllByCarId(id: Long, pageable: Pageable): Page<CarCheckUp>
 
-    fun findByDatePerformedBetween(
+    fun findByDatePerformedBetweenOrderByDatePerformed(
         startDate: LocalDateTime,
         endDate: LocalDateTime,
         pageable: Pageable
     ): Page<CarCheckUp>
 
     fun deleteAll()
+
+    fun deleteById(id: Long)
 }
