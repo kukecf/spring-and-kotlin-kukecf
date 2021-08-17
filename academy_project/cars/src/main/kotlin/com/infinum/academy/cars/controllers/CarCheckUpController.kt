@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 @RequestMapping("/cars/{carId}/checkups")
 class CarCheckUpController(
     private val checkupService: CarCheckUpService,
-    private val carService : CarService,
     private val resourceAssembler: CarCheckUpResourceAssembler
 ) {
     @GetMapping
@@ -28,9 +27,6 @@ class CarCheckUpController(
         pageable: Pageable,
         pagedResourcesAssembler: PagedResourcesAssembler<CarCheckUp>
     ): ResponseEntity<PagedModel<CheckUpResource>> {
-        if(carService.existsCar(carId).not()) { // mogao sam tu i samo pozvati funkciju getCar(), ali ovo se ljepse cita
-            throw CarNotFoundException(carId)
-        }
         return ResponseEntity.ok(
             pagedResourcesAssembler.toModel(
                 checkupService.getAllCheckUpsForCarId(carId, pageable),

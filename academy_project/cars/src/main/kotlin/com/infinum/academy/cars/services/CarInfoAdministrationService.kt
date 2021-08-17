@@ -22,12 +22,4 @@ class CarInfoAdministrationService(
             ).not()
         } ?: throw NoModelsException())
     }
-
-    fun deleteModels() {
-        infoRepository.deleteAll()
-    }
-
-    fun getModelWithId(manufacturer: String, model: String): CarInfo {
-        return infoRepository.findByCarInfoPk(CarInfoPrimaryKey(manufacturer, model)) ?: throw NoModelsException()
-    }
 }

@@ -32,6 +32,9 @@ class CarCheckUpService(
     }
 
     fun getAllCheckUpsForCarId(id: Long, pageable: Pageable): Page<CarCheckUp> {
+        if (carRepo.findById(id) == null) {
+            throw CarNotFoundException(id)
+        }
         return checkUpRepo.findAllByCarId(
             id,
             pageable
