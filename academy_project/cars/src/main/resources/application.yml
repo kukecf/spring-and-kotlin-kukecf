@@ -4,9 +4,16 @@ spring:
     url: "jdbc:postgresql://localhost:2345/car-db"
     username: "admin"
     password: "admin"
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     open-in-view: false
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+
+  flyway:
+    baseline-on-migrate: true
 
   security:
     oauth2:
@@ -14,3 +21,18 @@ spring:
         jwt:
           issuer-uri: "https://infinum.com"
           jwk-set-uri: "http://localhost:8888/jwks.json"
+
+  cache:
+    type: redis
+
+
+logging:
+  level.com.zaxxer.hikari: INFO
+  level.com.zaxxer.hikari.HikariConfig: INFO
+
+scheduling:
+  enabled: true
+
+car.info:
+  base-url: "https://car-api-4jzhjk72lq-ey.a.run.app"
+  schedule-interval: "P1D"
