@@ -115,6 +115,4 @@ tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootBuildImage> {
 
 testSets {
     //integrationTest {extendsFrom test}
-}
-
-//check.dependsOn integrationTest
+} //check.dependsOn integrationTest
