@@ -22,7 +22,5 @@ interface CarRepository : Repository<Car, Long> {
     @Query("select distinct car.info from Car car")
     fun findAllDistinctByInfo(pageable: Pageable): Page<CarInfo>
 
-    fun deleteAll()
-
     fun deleteById(id: Long)
 }

@@ -1,5 +1,8 @@
 spring:
 
+  main:
+    allow-bean-definition-overriding: true
+
   datasource:
     url: "jdbc:postgresql://localhost:2345/car-db"
     username: "admin"

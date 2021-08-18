@@ -9,6 +9,7 @@ import com.infinum.academy.cars.exceptions.CarInfoNotFoundException
 import com.infinum.academy.cars.exceptions.CarNotFoundException
 import com.infinum.academy.cars.repository.CarInfoRepository
 import com.infinum.academy.cars.repository.CarRepository
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -19,6 +20,7 @@ class CarService(
     private val carRepo: CarRepository,
     private val carInfoRepo: CarInfoRepository
 ) {
+    @Cacheable("model-info")
     fun addCar(carDto: AddCarDto): Long {
         val car = carDto.toCar { man, model ->
             carInfoRepo.findByCarInfoPk(
@@ -43,14 +45,7 @@ class CarService(
         carRepo.deleteById(id)
     }
 
-    @Transactional
-    fun deleteAll() {
-        carRepo.deleteAll()
-    }
-
     fun getAllAvailableModels(pageable: Pageable): Page<CarInfo> {
         return carRepo.findAllDistinctByInfo(pageable)
     }
-
-    fun existsCar(carId: Long) = carRepo.findById(carId) != null
 }

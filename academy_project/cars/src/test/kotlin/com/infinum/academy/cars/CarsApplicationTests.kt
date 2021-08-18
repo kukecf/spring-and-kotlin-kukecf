@@ -15,7 +15,6 @@ import org.springframework.http.MediaType
 import org.springframework.security.test.context.support.WithAnonymousUser
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.annotation.Rollback
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
@@ -39,6 +38,7 @@ class CarsApplicationTests @Autowired constructor(
 ) {
 
     private val ids = mutableListOf<Long>()
+
     @BeforeAll
     @WithMockUser(authorities = ["SCOPE_ADMIN"])
     fun setUp() {
@@ -78,7 +78,7 @@ class CarsApplicationTests @Autowired constructor(
     }
 
     @AfterAll
-    fun tearDown(){
+    fun tearDown() {
         //checkUpService.deleteAll()
         //carService.deleteAll()
         //infoService.deleteModels()
